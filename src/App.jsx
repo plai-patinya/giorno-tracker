@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from 'react';
-import { PlusCircle, Trash2, Edit2, PieChart, TrendingUp, Calendar, DollarSign, Package, Award, Activity, Save, X, Check, Download, Upload, RefreshCw, Gauge, Fuel, Navigation } from 'lucide-react';
+import { PlusCircle, Trash2, Edit2, PieChart, TrendingUp, Calendar, DollarSign, Package, Award, Activity, Save, X, Check, Download, Upload, RefreshCw, Gauge, Fuel} from 'lucide-react';
 
 const ExpenseTracker = () => {
   const BIKE_BASE_PRICE = 71500;
@@ -113,15 +113,30 @@ const ExpenseTracker = () => {
   const [editingFuelId, setEditingFuelId] = useState(null);
 
   useEffect(() => {
-    const init = async () => {
-      const expenseData = await loadExpenses();
-      const fuelData = await loadFuelRecords();
-      setExpenses(expenseData);
-      setFuelRecords(fuelData);
-      setLoading(false);
-    };
-    init();
-  }, []);
+  const init = async () => {
+    let expenseData = await loadExpenses();
+    let fuelData = await loadFuelRecords();
+
+    // 🔥 fallback ถ้า localStorage หลักพัง
+    if (!expenseData || expenseData.length === 0) {
+      const backup = localStorage.getItem('giorno-auto-backup');
+      if (backup) {
+        try {
+          const parsed = JSON.parse(backup);
+            expenseData = parsed.expenses || initialExpenses;
+            fuelData = parsed.fuelRecords || [];
+        } catch (e) {
+          console.error('Backup parse error:', e);
+        }
+      }
+    }
+
+    setExpenses(expenseData);
+    setFuelRecords(fuelData);
+    setLoading(false);
+  };
+  init();
+}, []);
 
   useEffect(() => {
     if (notification.show) {
@@ -131,6 +146,24 @@ const ExpenseTracker = () => {
       return () => clearTimeout(timer);
     }
   }, [notification.show]);
+
+  // AUTO BACKUP (background - ไม่รบกวน user)
+useEffect(() => {
+  const timer = setTimeout(() => {
+    try {
+      const backup = {
+        expenses,
+        fuelRecords,
+        backupDate: new Date().toISOString()
+      };
+      localStorage.setItem('giorno-auto-backup', JSON.stringify(backup));
+    } catch (e) {
+      console.error('Auto backup error:', e);
+    }
+  }, 1000);
+
+  return () => clearTimeout(timer);
+}, [expenses, fuelRecords]);
 
   // Auto-calculate fuel total price
   const fuelTotalPrice = useMemo(() => {
@@ -327,6 +360,39 @@ const ExpenseTracker = () => {
 
   const [showImportModal, setShowImportModal] = useState(false);
   const [importText, setImportText] = useState('');
+
+  const backupData = () => {
+    try {
+      const data = {
+        version: '1.1',
+        expenses,
+        fuelRecords,
+        backupDate: new Date().toISOString()
+      };
+
+      const blob = new Blob([JSON.stringify(data, null, 2)], {
+        type: 'application/json'
+      });
+
+      const url = URL.createObjectURL(blob);
+
+      const a = document.createElement('a');
+        a.href = url;
+        a.download = `giorno-backup-${new Date().toISOString().split('T')[0]}.json`;
+        a.click();
+
+      URL.revokeObjectURL(url);
+
+      setNotification({
+        show: true,
+        message: '✓ Backup สำเร็จ',
+        type: 'success'
+      });
+
+    } catch (e) {
+      console.error('Backup error:', e);
+    }
+  };
 
   const handleImportFromText = async () => {
     try {
@@ -874,22 +940,36 @@ const ExpenseTracker = () => {
                   
                   {showExportMenu && (
                     <div className="absolute right-0 mt-2 w-72 bg-slate-800/95 backdrop-blur-xl rounded-xl border border-white/20 shadow-2xl overflow-hidden z-50 animate-scaleIn">
+    
+                      {/* HEADER */}
                       <div className="p-3 bg-gradient-to-r from-orange-500/20 to-red-500/20 border-b border-white/10">
                         <div className="text-sm font-bold text-orange-300">💾 จัดการข้อมูล</div>
                         <div className="text-xs text-gray-400 mt-1">สำรองข้อมูลก่อนอัพเดท!</div>
                       </div>
-                      
+
+                      {/* ✅ Backup Button (ย้ายออกมา) */}
                       <button
-                        onClick={exportAllData}
+                        onClick={backupData}
                         className="w-full px-4 py-3 flex items-center gap-3 hover:bg-white/10 transition-all text-left"
                       >
-                        <Download size={18} className="text-green-400" />
-                        <div className="flex-1">
-                          <div className="font-semibold">ส่งออกข้อมูลทั้งหมด</div>
-                          <div className="text-xs text-gray-400">รายจ่าย + น้ำมัน (แนะนำ!)</div>
-                        </div>
+                        <Download size={18} className="text-purple-400" />
+                          <div className="flex-1">
+                            <div className="font-semibold">Backup ด่วน</div>
+                            <div className="text-xs text-gray-400">ดาวน์โหลดไฟล์ JSON ทันที</div>
+                          </div>
                       </button>
-                      
+
+                      <button
+                        onClick={exportAllData}
+                        className="w-full px-4 py-3 flex items-center gap-3 hover:bg-white/10 transition-all text-left border-t border-white/10"
+                      >
+                        <Download size={18} className="text-green-400" />
+                          <div className="flex-1">
+                            <div className="font-semibold">ส่งออกข้อมูลทั้งหมด</div>
+                            <div className="text-xs text-gray-400">รายจ่าย + น้ำมัน (แนะนำ!)</div>
+                            </div>
+                      </button>
+
                       <button
                         onClick={() => {
                           setShowImportModal(true);
@@ -903,7 +983,7 @@ const ExpenseTracker = () => {
                           <div className="text-xs text-gray-400">กู้คืนจากข้อความ JSON</div>
                         </div>
                       </button>
-                      
+
                       <button
                         onClick={resetData}
                         className="w-full px-4 py-3 flex items-center gap-3 hover:bg-white/10 transition-all text-left border-t border-white/10"
@@ -914,15 +994,16 @@ const ExpenseTracker = () => {
                           <div className="text-xs text-gray-400">กลับไปข้อมูลเริ่มต้น</div>
                         </div>
                       </button>
-                      
+
                       <div className="p-3 bg-yellow-500/10 border-t border-yellow-500/30">
                         <div className="text-xs text-yellow-300 flex items-start gap-2">
                           <span>⚠️</span>
                           <span>ก่อนอัพเดทเวอร์ชันใหม่ ควรส่งออกข้อมูลสำรองไว้ก่อนเสมอ!</span>
                         </div>
                       </div>
+
                     </div>
-                  )}
+                    )}
                 </div>
               </div>
             </div>
