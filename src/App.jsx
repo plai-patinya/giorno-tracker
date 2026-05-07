@@ -1,3 +1,12 @@
+import { auth, db } from "./firebase";
+import {
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  onAuthStateChanged,
+  signOut
+} from "firebase/auth";
+
+import { doc, setDoc, getDoc } from "firebase/firestore";
 import { useState, useMemo, useEffect } from 'react';
 import { PlusCircle, Trash2, Edit2, PieChart, TrendingUp, Calendar, DollarSign, Package, Award, Activity, Save, X, Check, Download, Upload, RefreshCw, Gauge, Fuel} from 'lucide-react';
 
@@ -102,6 +111,9 @@ const ExpenseTracker = () => {
   const [showExportMenu, setShowExportMenu] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
   const [showFuelModal, setShowFuelModal] = useState(false);
+  const [user, setUser] = useState(null);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   
   // Fuel form states
   const [fuelDate, setFuelDate] = useState(new Date().toISOString().split('T')[0]);
@@ -111,6 +123,72 @@ const ExpenseTracker = () => {
   const [fuelType, setFuelType] = useState('91');
   //const [fuelTotalPrice, setFuelTotalPrice] = useState('');
   const [editingFuelId, setEditingFuelId] = useState(null);
+
+  useEffect(() => {
+    const unsub = onAuthStateChanged(auth, (u) => {
+      setUser(u);
+      if (u) {
+        loadFromCloud(u.uid);
+      }
+    });
+
+    return () => unsub();
+  }, []);
+
+    const login = async () => {
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+    } catch (e) {
+      alert(e.message);
+    }
+  };
+
+    const register = async () => {
+    try {
+      await createUserWithEmailAndPassword(auth, email, password);
+    } catch (e) {
+      alert(e.message);
+    }
+  };
+
+    const logout = async () => {
+      await signOut(auth);
+    };
+
+    const saveToCloud = async (uid) => {
+  try {
+    await setDoc(doc(db, "users", uid), {
+      expenses,
+      fuelRecords
+    });
+  } catch (e) {
+    console.error("Cloud save error:", e);
+  }
+};
+    const loadFromCloud = async (uid) => {
+  try {
+    const ref = doc(db, "users", uid);
+    const snap = await getDoc(ref);
+
+    if (snap.exists()) {
+      const data = snap.data();
+      setExpenses(data.expenses || []);
+      setFuelRecords(data.fuelRecords || []);
+    }
+  } catch (e) {
+    console.error("Cloud load error:", e);
+  }
+};
+
+    useEffect(() => {
+  if (user && !loading) {
+    const timer = setTimeout(() => {
+      saveToCloud(user.uid);
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  }
+}, [expenses, fuelRecords, user, loading]);
 
   useEffect(() => {
   const init = async () => {
@@ -556,6 +634,36 @@ useEffect(() => {
       </div>
     );
   }
+  
+  if (!user) {
+  return (
+    <div className="min-h-screen flex flex-col items-center justify-center gap-4 bg-slate-900 text-white">
+      <h1 className="text-2xl font-bold">Giorno Login</h1>
+
+      <input
+        type="email"
+        placeholder="Email"
+        onChange={(e) => setEmail(e.target.value)}
+        className="px-4 py-2 rounded text-black"
+      />
+
+      <input
+        type="password"
+        placeholder="Password"
+        onChange={(e) => setPassword(e.target.value)}
+        className="px-4 py-2 rounded text-black"
+      />
+
+      <button onClick={login} className="bg-green-500 px-4 py-2 rounded">
+        Login
+      </button>
+
+      <button onClick={register} className="bg-blue-500 px-4 py-2 rounded">
+        Register
+      </button>
+    </div>
+  );
+}
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 text-white p-4 sm:p-6 pb-24 px-4">
