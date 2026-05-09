@@ -6,7 +6,7 @@ import {
   signOut
 } from "firebase/auth";
 
-import { doc, setDoc, getDoc } from "firebase/firestore";
+import { doc, setDoc, onSnapshot } from "firebase/firestore";
 import { useState, useMemo, useEffect } from 'react';
 import { PlusCircle, Trash2, Edit2, PieChart, TrendingUp, Calendar, DollarSign, Package, Award, Activity, Save, X, Check, Download, Upload, RefreshCw, Gauge, Fuel} from 'lucide-react';
 
@@ -123,17 +123,23 @@ const ExpenseTracker = () => {
   const [fuelType, setFuelType] = useState('91');
   //const [fuelTotalPrice, setFuelTotalPrice] = useState('');
   const [editingFuelId, setEditingFuelId] = useState(null);
+  const [cloudLoaded, setCloudLoaded] = useState(false);
 
   useEffect(() => {
-    const unsub = onAuthStateChanged(auth, (u) => {
-      setUser(u);
-      if (u) {
-        loadFromCloud(u.uid);
-      }
-    });
+  const unsub = onAuthStateChanged(auth, (u) => {
+    setUser(u);
+  });
 
-    return () => unsub();
-  }, []);
+  return () => unsub();
+}, []);
+
+  useEffect(() => {
+  if (!user) return;
+
+  const unsub = subscribeToCloud(user.uid);
+
+  return () => unsub();
+}, [user]);
 
     const login = async () => {
     try {
@@ -165,30 +171,33 @@ const ExpenseTracker = () => {
     console.error("Cloud save error:", e);
   }
 };
-    const loadFromCloud = async (uid) => {
-  try {
-    const ref = doc(db, "users", uid);
-    const snap = await getDoc(ref);
+    const subscribeToCloud = (uid) => {
+  const ref = doc(db, "users", uid);
 
+  return onSnapshot(ref, (snap) => {
     if (snap.exists()) {
       const data = snap.data();
+
       setExpenses(data.expenses || []);
       setFuelRecords(data.fuelRecords || []);
+
+      setCloudLoaded(true);
+    } else {
+      setCloudLoaded(true);
     }
-  } catch (e) {
-    console.error("Cloud load error:", e);
-  }
+  });
 };
 
     useEffect(() => {
-  if (user && !loading) {
-    const timer = setTimeout(() => {
-      saveToCloud(user.uid);
-    }, 1000);
+  if (!user || loading || !cloudLoaded) return;
 
-    return () => clearTimeout(timer);
-  }
-}, [expenses, fuelRecords, user, loading]);
+  const timer = setTimeout(() => {
+    saveToCloud(user.uid);
+  }, 1000);
+
+  return () => clearTimeout(timer);
+
+}, [expenses, fuelRecords, user, loading, cloudLoaded]);
 
   useEffect(() => {
   const init = async () => {
@@ -628,12 +637,15 @@ useEffect(() => {
   };
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center">
-        <div className="text-white text-2xl animate-pulse">🏍️ กำลังโหลด...</div>
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-slate-900 text-white">
+      <div className="text-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500 mx-auto"></div>
+        <p className="mt-4 text-gray-400">กำลังโหลดข้อมูล...</p>
       </div>
-    );
-  }
+    </div>
+  );
+}
   
   if (!user) {
   return (
@@ -1036,7 +1048,18 @@ useEffect(() => {
                   🏍️ HONDA GIORNO
                 </h1>
               </div>
-              <div className="flex-1 flex justify-end">
+              <div className="flex-1 flex justify-end items-center gap-3">
+
+              <div className="text-sm text-gray-400 hidden sm:block">
+                {user?.email}
+              </div>
+
+              <button
+                onClick={logout}
+                className="px-4 py-2 rounded-xl bg-red-500/20 hover:bg-red-500/30 border border-red-500/30 text-red-300 transition-all"
+              >
+                Logout
+              </button>
                 <div className="relative">
                   <button
                     onClick={() => setShowExportMenu(!showExportMenu)}
