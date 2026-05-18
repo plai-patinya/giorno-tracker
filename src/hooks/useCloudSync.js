@@ -24,7 +24,7 @@ const useCloudSync = ({
 
 
   // 🔥 Realtime Subscribe
-  useEffect(() => {
+  /*useEffect(() => {
 
     if (!user) return;
 
@@ -38,32 +38,39 @@ const useCloudSync = ({
 
     return () => unsub();
 
-  }, [user]);
+  }, [user]);*/
 
 
-  // ☁️ Auto Save
+// ☁️ Auto Save
   useEffect(() => {
 
-  if (!user || loading || !cloudLoaded) return;
+    if (!user || loading || !cloudLoaded) return;
 
-  if (
-    expenses.length === 0 &&
-    fuelRecords.length === 0 &&
-    serviceHistory.length === 0
-  ) return;
+    // ❗ เพิ่ม guard สำคัญ
+    if (
+      expenses.length === 0 &&
+      fuelRecords.length === 0 &&
+      serviceHistory.length === 0
+    ) {
+      console.log("⛔ skip save (empty data)");
+      return;
+    }
 
-  const timer = setTimeout(() => {
+    // ❗ เพิ่ม delay เพื่อรอ data load จริง
+    const timer = setTimeout(() => {
 
-    saveUserData(
-      user.uid,
-      expenses,
-      fuelRecords,
-      serviceHistory
-    );
+      console.log("☁️ saving to cloud...");
 
-  }, 1000);
+      /*saveUserData(
+        user.uid,
+        expenses,
+        fuelRecords,
+        serviceHistory
+      );*/
 
-  return () => clearTimeout(timer);
+    }, 3000);
+
+    return () => clearTimeout(timer);
 
   }, [
     expenses,
