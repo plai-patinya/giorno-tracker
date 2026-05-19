@@ -5,7 +5,6 @@ import {
   subscribeUserData
 } from "../services/firebaseService";
 
-
 const useCloudSync = ({
   user,
   loading,
@@ -22,11 +21,14 @@ const useCloudSync = ({
 
   const [cloudLoaded, setCloudLoaded] = useState(false);
 
-
-  // 🔥 Realtime Subscribe
-  /*useEffect(() => {
+  //
+  // 🔥 Realtime Subscribe (ต้องอยู่ใน useEffect)
+  //
+  useEffect(() => {
 
     if (!user) return;
+
+    console.log("🔄 Subscribing to cloud...");
 
     const unsub = subscribeUserData(
       user.uid,
@@ -36,39 +38,44 @@ const useCloudSync = ({
       setCloudLoaded
     );
 
-    return () => unsub();
+    return () => {
+      console.log("🛑 Unsubscribe");
+      unsub();
+    };
 
-  }, [user]);*/
+  }, [user]);
 
 
-// ☁️ Auto Save
+
+  //
+  // ☁️ Auto Save
+  //
   useEffect(() => {
 
     if (!user || loading || !cloudLoaded) return;
 
-    // ❗ เพิ่ม guard สำคัญ
+    // ❗ กัน empty overwrite
     if (
       expenses.length === 0 &&
       fuelRecords.length === 0 &&
       serviceHistory.length === 0
     ) {
-      console.log("⛔ skip save (empty data)");
+      console.log("⛔ skip save (empty)");
       return;
     }
 
-    // ❗ เพิ่ม delay เพื่อรอ data load จริง
     const timer = setTimeout(() => {
 
-      console.log("☁️ saving to cloud...");
+      console.log("☁️ SAFE SAVE");
 
-      /*saveUserData(
+      saveUserData(
         user.uid,
         expenses,
         fuelRecords,
         serviceHistory
-      );*/
+      );
 
-    }, 3000);
+    }, 2000);
 
     return () => clearTimeout(timer);
 

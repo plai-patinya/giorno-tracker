@@ -51,6 +51,7 @@ import {
 import useCloudSync from "./hooks/useCloudSync";
 
 import { loginUser, registerUser, logoutUser, saveUserData } from "./services/firebaseService";
+window.saveUserData = saveUserData;
 import { useState, useMemo, useEffect } from 'react';
 import { PlusCircle, Trash2, Edit2, PieChart, TrendingUp, Calendar, DollarSign, Package, Award, Activity, Save, X, Check, Download, Upload, RefreshCw, Gauge, Fuel } from 'lucide-react';
 
@@ -253,6 +254,12 @@ const ExpenseTracker = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const { user, authLoading } = useAuth();
+
+      useEffect(() => {
+    if (user) {
+      window.getUser = () => user;
+    }
+  }, [user]);
 
   //
   // ☁️ CLOUD SYNC
@@ -579,9 +586,17 @@ const {
 });
 
   const filteredExpenses = useMemo(() => {
-    return expenses.filter(exp =>
-      exp.item.toLowerCase().includes(searchTerm.toLowerCase())
-    ).sort((a, b) => new Date(b.date) - new Date(a.date));
+
+    const safeExpenses = Array.isArray(expenses)
+      ? expenses
+      : [];
+
+    return safeExpenses
+      .filter(exp =>
+        exp.item?.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+      .sort((a, b) => new Date(b.date) - new Date(a.date));
+
   }, [expenses, searchTerm]);
 
   const fuelStats =

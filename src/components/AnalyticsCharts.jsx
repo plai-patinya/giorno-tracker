@@ -521,43 +521,27 @@ import {
     // ⛽ FUEL ANALYTICS
     //
 
-    const fuelAnalytics =
-    fuelRecords
+    const safeFuel = Array.isArray(fuelRecords)
+    ? fuelRecords
+    : [];
 
+    const fuelAnalytics =
+    safeFuel
         .filter(
         (record) =>
-
             Number(record.distance) > 0 &&
             Number(record.liters) > 0
         )
-
         .map((record) => {
-
-        const distance =
-            Number(record.distance);
-
-        const liters =
-            Number(record.liters);
-
-        const totalPrice =
-            Number(record.totalPrice);
-
-        const kmPerLiter =
-            distance / liters;
-
-        const costPerKm =
-            totalPrice / distance;
+        const distance = Number(record.distance);
+        const liters = Number(record.liters);
+        const totalPrice = Number(record.totalPrice);
 
         return {
-
             ...record,
-
-            kmPerLiter,
-
-            costPerKm
-
+            kmPerLiter: distance / liters,
+            costPerKm: totalPrice / distance
         };
-
         });
 
     //
@@ -647,14 +631,17 @@ import {
     // 🛠️ DYNAMIC MAINTENANCE
     //
 
+    const safeService = Array.isArray(serviceHistory)
+    ? serviceHistory
+    : [];
+
     const getLatestService = (type) => {
 
-    return serviceHistory
-    .filter((item) => item.type === type)
-    .sort((a, b) =>
+    return safeService
+        .filter((item) => item.type === type)
+        .sort((a, b) =>
         new Date(b.date) - new Date(a.date)
-    )[0];
-
+        )[0];
     };
 
     const oilLatest =
@@ -722,15 +709,9 @@ import {
 
     const latestFuelRecord =
 
-    [...fuelRecords]
-
-        .sort(
-
-        (a, b) =>
-
-            new Date(b.date) -
-            new Date(a.date)
-
+    [...safeFuel]
+        .sort((a, b) =>
+        new Date(b.date) - new Date(a.date)
         )[0];
 
     const currentOdo =

@@ -1,41 +1,50 @@
 import { useMemo } from "react";
 
-const useFuelAnalytics = (fuelRecords) => {
+const useFuelAnalytics = (fuelRecordsInput = []) => {
+
+  const fuelRecords = Array.isArray(fuelRecordsInput)
+    ? fuelRecordsInput
+    : [];
 
   const fuelStats = useMemo(() => {
 
-    if (fuelRecords.length === 0) {
+    const safeFuel = Array.isArray(fuelRecords)
+      ? fuelRecords
+      : [];
+
+    if (safeFuel.length === 0) {
       return null;
     }
 
-    const sorted = [...fuelRecords]
+    const sorted = [...safeFuel]
       .sort((a, b) => a.odometer - b.odometer);
 
-    const latest =
-      sorted[sorted.length - 1];
+    const latest = sorted[sorted.length - 1];
 
     const totalDistance =
       latest.odometer -
       (sorted[0]?.odometer || 0);
 
     const totalLiters =
-      fuelRecords.reduce(
-        (sum, rec) => sum + rec.liters,
+      safeFuel.reduce(
+        (sum, rec) => sum + (rec.liters || 0),
         0
       );
 
     const totalSpent =
-      fuelRecords.reduce(
-        (sum, rec) => sum + rec.totalPrice,
+      safeFuel.reduce(
+        (sum, rec) => sum + (rec.totalPrice || 0),
         0
       );
 
     const avgEfficiency =
-      totalDistance / totalLiters;
+      totalLiters > 0
+        ? totalDistance / totalLiters
+        : 0;
 
     const efficiencies =
-      fuelRecords
-        .filter(r => r.efficiency)
+      safeFuel
+        .filter(r => r?.efficiency)
         .map(r => r.efficiency);
 
     const bestEfficiency =
@@ -48,10 +57,11 @@ const useFuelAnalytics = (fuelRecords) => {
         ? Math.min(...efficiencies)
         : 0;
 
-    // 📅 Monthly stats
     const monthlyStats = {};
 
-    fuelRecords.forEach((record) => {
+    safeFuel.forEach((record) => {
+
+      if (!record?.date) return;
 
       const monthKey =
         record.date.substring(0, 7);
@@ -69,23 +79,13 @@ const useFuelAnalytics = (fuelRecords) => {
 
       }
 
-      monthlyStats[monthKey]
-        .totalSpent += record.totalPrice;
-
-      monthlyStats[monthKey]
-        .totalLiters += record.liters;
-
-      monthlyStats[monthKey]
-        .count++;
-
-      monthlyStats[monthKey]
-        .records.push(record);
+      monthlyStats[monthKey].totalSpent += record.totalPrice || 0;
+      monthlyStats[monthKey].totalLiters += record.liters || 0;
+      monthlyStats[monthKey].count++;
+      monthlyStats[monthKey].records.push(record);
 
       if (record.distance) {
-
-        monthlyStats[monthKey]
-          .totalDistance += record.distance;
-
+        monthlyStats[monthKey].totalDistance += record.distance;
       }
 
     });
@@ -97,28 +97,15 @@ const useFuelAnalytics = (fuelRecords) => {
         );
 
     return {
-
-      currentOdometer:
-        latest.odometer,
-
+      currentOdometer: latest.odometer,
       totalDistance,
-
       totalLiters,
-
       totalSpent,
-
       avgEfficiency,
-
       bestEfficiency,
-
       worstEfficiency,
-
-      recordCount:
-        fuelRecords.length,
-
-      monthlyStats:
-        monthlyArray
-
+      recordCount: safeFuel.length,
+      monthlyStats: monthlyArray
     };
 
   }, [fuelRecords]);

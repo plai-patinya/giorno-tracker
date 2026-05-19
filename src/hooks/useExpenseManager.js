@@ -3,11 +3,15 @@ import {
   BIKE_BASE_PRICE
 } from "../constants/appConstants";
 
-    const useExpenseManager = (expenses = []) => {
+  const useExpenseManager = (expensesInput = []) => {
+
+    const expenses = Array.isArray(expensesInput)
+        ? expensesInput
+        : [];
 
   // 💰 ค่าใช้จ่ายรวม
   const totalExpense = useMemo(() => {
-    return expenses.reduce(
+    return expenses?.reduce(
       (sum, item) => sum + Number(item.price || 0),
       0
     );
@@ -16,8 +20,8 @@ import {
   // 🔧 ค่าแต่ง
   const partsExpense = useMemo(() => {
     return expenses
-      .filter((item) => item.category !== "base")
-      .reduce(
+      ?.filter((item) => item.category !== "base")
+      ?.reduce(
         (sum, item) => sum + Number(item.price || 0),
         0
       );
@@ -28,7 +32,7 @@ import {
 
   const totals = {};
 
-  expenses.forEach((item) => {
+  expenses?.forEach((item) => {
 
     if (!totals[item.category]) {
       totals[item.category] = 0;
@@ -50,7 +54,7 @@ import {
 
     const grouped = {};
 
-    expenses.forEach((item) => {
+    expenses?.forEach((item) => {
 
       const month = item.date?.slice(0, 7);
 
@@ -69,7 +73,7 @@ import {
   // 📈 Stats
   const stats = useMemo(() => {
 
-  const totalItems = expenses.length;
+  const totalItems = expenses?.length || 0;
 
   const totalExpenseWithBike =
   totalExpense + BIKE_BASE_PRICE;
