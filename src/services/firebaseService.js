@@ -13,75 +13,86 @@ import {
   getDoc
 } from "firebase/firestore";
 
+  const mergeById = (local = [], cloud = []) => {
+    const map = new Map();
+
+    [...local, ...cloud].forEach(item => {
+      if (!item?.id) return;
+      map.set(item.id, item);
+    });
+
+    return Array.from(map.values());
+  };
+
 //
 // 🔐 LOGIN
 //
 
-export const loginUser = async (email, password) => {
-  return await signInWithEmailAndPassword(auth, email, password);
-};
+  export const loginUser = async (email, password) => {
+    return await signInWithEmailAndPassword(auth, email, password);
+  };
 
 //
 // 🔐 REGISTER
 //
 
-export const registerUser = async (email, password) => {
-  return await createUserWithEmailAndPassword(auth, email, password);
-};
+  export const registerUser = async (email, password) => {
+    return await createUserWithEmailAndPassword(auth, email, password);
+  };
 
 //
 // 🔐 LOGOUT
 //
 
-export const logoutUser = async () => {
-  return await signOut(auth);
-};
+  export const logoutUser = async () => {
+    return await signOut(auth);
+  };
 
 //
 // ☁️ SAVE TO CLOUD
 //
 
-export const saveUserData = async (
-  uid,
-  expenses,
-  fuelRecords,
-  serviceHistory
-) => {
-
-  await setDoc(doc(db, "users", uid), {
+  export const saveUserData = async (
+    uid,
     expenses,
     fuelRecords,
     serviceHistory
-  });
+  ) => {
 
-};
+    await setDoc(doc(db, "users", uid), {
+      expenses,
+      fuelRecords,
+      serviceHistory
+    });
+
+  };
 
 //
 // ☁️ GET USER DATA (แก้ใหม่ให้ถูก)
 //
 
-export const getUserData = async (uid) => {
+  export const getUserData = async (uid) => {
 
-  const userRef = doc(db, "users", uid);
-  const snap = await getDoc(userRef);
+    const userRef = doc(db, "users", uid);
+    const snap = await getDoc(userRef);
 
-  if (!snap.exists()) {
+    if (!snap.exists()) {
+      return {
+        expenses: [],
+        fuelRecords: [],
+        serviceHistory: []
+      };
+    }
+
+    const data = snap.data();
+
     return {
-      expenses: [],
-      fuelRecords: [],
-      serviceHistory: []
+      expenses: data?.expenses || [],
+      fuelRecords: data?.fuelRecords || [],
+      serviceHistory: data?.serviceHistory || []
     };
-  }
 
-  const data = snap.data();
-
-  return {
-    expenses: data?.expenses || [],
-    fuelRecords: data?.fuelRecords || [],
-    serviceHistory: data?.serviceHistory || []
   };
-
-};
 
 //
 // ⚡ REALTIME SUBSCRIBE
@@ -107,25 +118,28 @@ export const subscribeUserData = (
 
         const data = snap.data();
 
-        // 💸 EXPENSES
-        setExpenses(data?.expenses || []);
+        console.log("☁️ Cloud data:", data);
 
-        // ⛽ FUEL
-        setFuelRecords(data?.fuelRecords || []);
+        // 💸 EXPENSES (🔥 merge)
+        setExpenses(prev =>
+          mergeById(prev, data?.expenses || [])
+        );
 
-        // 🛠️ SERVICE (แก้ตรงนี้สำคัญมาก)
-        if (data?.serviceHistory && data.serviceHistory.length > 0) {
-          setServiceHistory(data.serviceHistory);
-        }
+        // ⛽ FUEL (🔥 merge)
+        setFuelRecords(prev =>
+          mergeById(prev, data?.fuelRecords || [])
+        );
+
+        // 🛠️ SERVICE (🔥 merge)
+        setServiceHistory(prev =>
+          mergeById(prev, data?.serviceHistory || [])
+        );
 
         setCloudLoaded(true);
 
       } else {
 
-        // USER ใหม่
-        setExpenses([]);
-        setFuelRecords([]);
-        setServiceHistory([]);
+        console.log("🆕 New user (no cloud data)");
 
         setCloudLoaded(true);
 

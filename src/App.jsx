@@ -273,15 +273,15 @@ const ExpenseTracker = () => {
 
   });
 
-  const {
+  //const {
 
-  data: cloudExpenses,
+  //data: cloudExpenses,
 
-  isLoading: expensesLoading,
+  //isLoading: expensesLoading,
 
-  error: expensesError
+  //error: expensesError
 
-  } = useExpensesQuery(user);
+  //} = useExpensesQuery(user);
 
   const saveExpensesMutation =
   useSaveExpensesMutation(user);
@@ -398,7 +398,7 @@ const {
 } = useExpenseCRUD({
   expenses,
   setExpenses,
-  saveExpenses: saveExpensesWithSync,
+  saveExpenses: saveExpenses,
   newItem,
   setNewItem,
   newPrice,
@@ -470,18 +470,6 @@ const {
   init();
 }, []);
 
-  useEffect(() => {
-
-    if (
-      cloudExpenses &&
-      cloudExpenses.length > 0
-    ) {
-
-      setExpenses(cloudExpenses);
-
-    }
-
-  }, [cloudExpenses]);
 
   useEffect(() => {
     if (notification.show) {
