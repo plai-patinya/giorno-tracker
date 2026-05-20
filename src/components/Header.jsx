@@ -4,6 +4,7 @@ import {
   MoreVertical,
   LogOut
 } from "lucide-react";
+import { calculateDuration } from "../utils/dateUtils";
 
 const Header = ({
   user,
@@ -23,6 +24,9 @@ const Header = ({
 
   formatThaiDate
 }) => {
+
+  const duration = calculateDuration("2025-02-21");
+  const APP_VERSION = "1.0.0";
 
   return (
     <div className="text-center mb-8 relative">
@@ -89,13 +93,19 @@ const Header = ({
           <span>•</span>
 
           <span>
-            ⏱️ {stats.daysSinceReceived} วัน
+            ⏱️ {
+              duration
+                ? `${duration.years > 0 ? duration.years + " ปี " : ""}${
+                    duration.months > 0 ? duration.months + " เดือน " : ""
+                  }${duration.days} วัน`
+                : "..."
+            }
           </span>
 
           <span>•</span>
 
-          <span className="text-yellow-400">
-            💾 v1.0
+          <span className="text-gray-400">
+            💾 v{APP_VERSION}
           </span>
 
         </div>
