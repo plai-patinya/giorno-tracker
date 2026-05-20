@@ -124,24 +124,10 @@ export const subscribeUserData = (
           if (Array.isArray(value)) return value;
           return [];
         };
-
-        // 💸 EXPENSES
-        setExpenses(prev =>
-          mergeById(prev, safeArray(data?.expenses))
-        );
-
-        // ⛽ FUEL
-        setFuelRecords(prev =>
-          mergeById(prev, safeArray(data?.fuelRecords))
-        );
-
-        // 🛠️ SERVICE
-        setServiceHistory(prev =>
-          mergeById(prev, safeArray(data?.serviceHistory))
-        );
-
+        setExpenses(safeArray(data?.expenses));
+        setFuelRecords(safeArray(data?.fuelRecords));
+        setServiceHistory(safeArray(data?.serviceHistory));
         setCloudLoaded(true);
-
       } else {
 
         console.log("🆕 New user (no cloud data)");

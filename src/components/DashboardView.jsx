@@ -9,6 +9,7 @@ import AnalyticsCharts
   from "./AnalyticsCharts";
 
   const DashboardView = ({
+    expenses,
     stats,
     BIKE_BASE_PRICE,
     partsExpense,
@@ -41,8 +42,8 @@ import AnalyticsCharts
                   <TrendingUp size={14} />
                   ค่าแต่งทั้งหมด
                 </div>
-                <div className="text-2xl sm:text-4xl font-black mb-1">฿{partsExpense.toLocaleString()}</div>
-                <div className="text-xs text-orange-300">{stats.totalItems} รายการ</div>
+                <div className="text-2xl sm:text-4xl font-black mb-1">฿{(partsExpense || 0).toLocaleString()}</div>
+                <div className="text-xs text-orange-300">{stats?.totalItems || 0} รายการ</div>
               </div>
 
               <div className="bg-gradient-to-br from-blue-600/30 to-cyan-600/30 backdrop-blur-xl rounded-2xl p-4 sm:p-6 border border-blue-500/30 shadow-2xl hover:scale-105 transition-transform">

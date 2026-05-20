@@ -185,15 +185,14 @@ const ExpenseTracker = () => {
   });
   
   const {
-
   totalExpense,
   partsExpense,
-
   categoryTotals,
   monthlyData,
-
   stats
 } = useExpenseManager(expenses);
+console.log("🔥 expenses:", expenses);
+console.log("🔥 partsExpense:", partsExpense);
 
   const [newItem, setNewItem] = useState('');
   const [newPrice, setNewPrice] = useState('');
@@ -266,18 +265,14 @@ const ExpenseTracker = () => {
   //
 
   useCloudSync({
-
     user,
     loading,
-
     expenses,
     fuelRecords,
     serviceHistory,
-
     setExpenses,
     setFuelRecords,
     setServiceHistory
-
   });
 
   //const {
@@ -334,14 +329,15 @@ const ExpenseTracker = () => {
     // cloud
     //
 
+    const safeExpenses = JSON.parse(JSON.stringify(expenses));
+    const safeFuel = JSON.parse(JSON.stringify(fuelRecords));
+    const safeService = JSON.parse(JSON.stringify(serviceHistory));
+
     await saveUserData(
-
       user.uid,
-
-      expenses,
-      fuelRecords,
-      data
-
+      safeExpenses,
+      safeFuel,
+      safeService
     );
 
   };
@@ -470,8 +466,13 @@ const {
       }
     }
 
-    setExpenses(expenseData);
-    setFuelRecords(fuelData);
+    if (expenseData && expenseData.length > 0) {
+      setExpenses(expenseData);
+    }
+
+    if (fuelData && fuelData.length > 0) {
+      setFuelRecords(fuelData);
+    }
     setLoading(false);
   };
   init();
@@ -607,18 +608,9 @@ const {
 //
 
   useEffect(() => {
-
-    if (
-      expenses &&
-      expenses.length > 0
-    ) {
-
-      saveExpensesToDB(
-        expenses
-      );
-
+    if (Array.isArray(expenses) && expenses.length > 0) {
+      saveExpensesToDB(expenses);
     }
-
   }, [expenses]);
 
   //
@@ -673,18 +665,9 @@ const {
   }, []);
 
   useEffect(() => {
-
-    if (
-      fuelRecords &&
-      fuelRecords.length > 0
-    ) {
-
-      saveFuelToDB(
-        fuelRecords
-      );
-
+    if (Array.isArray(fuelRecords) && fuelRecords.length > 0) {
+      saveFuelToDB(fuelRecords);
     }
-
   }, [fuelRecords]);
 
   if (loading || authLoading) {
@@ -873,6 +856,7 @@ const {
             monthlyData={monthlyData}
             categoryTotals={categoryTotals}
             categories={categories}
+            expenses={expenses}
             fuelRecords={fuelRecords}
             serviceHistory={serviceHistory}
             setServiceHistory={setServiceHistory}

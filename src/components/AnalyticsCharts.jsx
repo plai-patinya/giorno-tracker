@@ -2191,7 +2191,7 @@ import {
 
           <div className="h-[340px] relative">
 
-            <ResponsiveContainer>
+            <ResponsiveContainer width="100%" height={300}>
 
               <PieChart>
 
@@ -2616,7 +2616,7 @@ import {
 
         <div className="h-[340px] min-h-[340px] w-full">
 
-          <ResponsiveContainer width="100%" height="100%">
+          <ResponsiveContainer width="100%" height={300}>
 
             <BarChart
               data={monthlyChartData}

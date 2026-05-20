@@ -56,6 +56,9 @@ const useCloudSync = ({
 
     // ❗ กัน empty overwrite
     if (
+      Array.isArray(expenses) &&
+      Array.isArray(fuelRecords) &&
+      Array.isArray(serviceHistory) &&
       expenses.length === 0 &&
       fuelRecords.length === 0 &&
       serviceHistory.length === 0
@@ -64,18 +67,33 @@ const useCloudSync = ({
       return;
     }
 
-    const timer = setTimeout(() => {
+  const timer = setTimeout(() => {
 
-      console.log("☁️ SAFE SAVE");
+    console.log("☁️ SAFE SAVE");
 
-      saveUserData(
-        user.uid,
-        expenses,
-        fuelRecords,
-        serviceHistory
-      );
+    // ✅ กัน type พัง
+    if (
+      !Array.isArray(expenses) ||
+      !Array.isArray(fuelRecords) ||
+      !Array.isArray(serviceHistory)
+    ) {
+      console.warn("❌ Invalid data type - skip sync");
+      return;
+    }
 
-    }, 2000);
+    // ✅ sanitize กัน function / proxy
+    const safeExpenses = JSON.parse(JSON.stringify(expenses));
+    const safeFuel = JSON.parse(JSON.stringify(fuelRecords));
+    const safeService = JSON.parse(JSON.stringify(serviceHistory));
+
+    saveUserData(
+      user.uid,
+      safeExpenses,
+      safeFuel,
+      safeService
+    );
+
+  }, 2000);
 
     return () => clearTimeout(timer);
 
