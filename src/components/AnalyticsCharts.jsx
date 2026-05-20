@@ -1632,51 +1632,38 @@ import {
 
             {/* HEADER */}
 
-            <div className="flex items-center justify-between mb-6">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
 
-                <div>
-
-                <h2 className="text-2xl font-black text-white">
-
-                    🕘 ประวัติการ Service
-
+            {/* 🔹 LEFT */}
+            <div>
+                <h2 className="text-xl sm:text-2xl font-black text-white">
+                🕘 ประวัติการ Service
                 </h2>
 
-                <p className="text-sm text-white/50 mt-1">
-
-                    ประวัติการดูแลรักษารถย้อนหลัง
-
+                <p className="text-xs sm:text-sm text-white/50 mt-1">
+                ประวัติการดูแลรักษารถย้อนหลัง
                 </p>
+            </div>
 
+            {/* 🔹 RIGHT */}
+            <div className="flex items-center gap-2">
+
+                {/* record count */}
+                <div className="rounded-xl border border-white/10 bg-white/5 px-3 py-1 text-xs text-white/60 whitespace-nowrap">
+                {serviceHistory.length} records
                 </div>
 
-                <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-2 text-sm text-white/60">
-
-                <div className="flex items-center gap-3">
-
-                <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-2 text-sm text-white/60">
-
-                    {serviceHistory.length} records
-
-                </div>
-
+                {/* add button */}
                 <button
-
-                    onClick={() =>
-                    setShowServiceModal(true)
-                    }
-
-                    className="rounded-2xl bg-cyan-500/20 border border-cyan-400/20 px-4 py-2 text-sm font-semibold text-cyan-200 hover:bg-cyan-500/30 transition-all"
-
+                onClick={() => setShowServiceModal(true)}
+                className="rounded-xl bg-cyan-500/20 border border-cyan-400/20 px-3 py-1.5 text-xs font-semibold text-cyan-200 hover:bg-cyan-500/30 transition-all whitespace-nowrap"
                 >
-
-                    + เพิ่มรายการ
-
+                + เพิ่ม
                 </button>
 
-                </div>
+            </div>
 
-                </div>
+            </div>
 
             </div>
 
@@ -2131,8 +2118,6 @@ import {
 
             )
             }
-
-    </div>  
 
       {/* ================================= */}
       {/* PIE CHART */}
