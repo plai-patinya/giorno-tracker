@@ -39,7 +39,7 @@ const Header = ({
 
         {/* 🔥 TITLE CENTER */}
         <div className="text-center">
-          <h1 className="text-3xl sm:text-5xl md:text-6xl font-black mb-2 tracking-tight bg-gradient-to-r from-orange-400 via-red-400 to-pink-400 bg-clip-text text-transparent">
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black mb-2 tracking-tight bg-gradient-to-r from-orange-400 via-red-400 to-pink-400 bg-clip-text text-transparent">
             🏍️ HONDA GIORNO
           </h1>
         </div>
@@ -81,7 +81,7 @@ const Header = ({
       </div>
 
         <p className="text-gray-400 text-sm sm:text-base">
-          Track Your Dream Build
+          Vehicle Intelligence Platform
         </p>
 
         <div className="flex items-center justify-center gap-2 sm:gap-4 mt-3 text-xs sm:text-sm text-gray-400 flex-wrap">

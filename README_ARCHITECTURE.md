@@ -1,0 +1,6 @@
+- data flow
+- hooks
+- analytics engine
+- AI engine
+- database collections
+- naming convention

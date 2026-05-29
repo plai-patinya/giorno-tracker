@@ -3,7 +3,7 @@ import { openDB } from "idb";
 const DB_NAME =
   "giorno-tracker-db";
 
-const DB_VERSION = 1;
+const DB_VERSION = 2;
 
 const EXPENSE_STORE =
   "expenses";
@@ -50,6 +50,24 @@ export const initDB =
               {
                 keyPath: "id"
               }
+            );
+
+          }
+
+          if (
+            !db.objectStoreNames.contains(
+              "maintenanceRecords"
+            )
+          ) {
+
+            db.createObjectStore(
+
+              "maintenanceRecords",
+
+              {
+                keyPath: "id"
+              }
+
             );
 
           }
@@ -146,5 +164,70 @@ export const getFuelFromDB =
     return db.getAll(
       FUEL_STORE
     );
+
+};
+//
+// 🛠️ SAVE MAINTENANCE
+//
+
+export const saveMaintenanceRecords =
+async (records) => {
+
+  const db =
+    await initDB();
+
+  const tx =
+    db.transaction(
+      "maintenanceRecords",
+      "readwrite"
+    );
+
+  const store =
+    tx.objectStore(
+      "maintenanceRecords"
+    );
+
+  //
+  // CLEAR OLD
+  //
+
+  await store.clear();
+
+  //
+  // SAVE ALL
+  //
+
+  for (const record of records) {
+
+    await store.put(record);
+
+  }
+
+  return tx.done;
+
+};
+
+//
+// 🛠️ LOAD MAINTENANCE
+//
+
+export const loadMaintenanceRecords =
+async () => {
+
+  const db =
+    await initDB();
+
+  const tx =
+    db.transaction(
+      "maintenanceRecords",
+      "readonly"
+    );
+
+  const store =
+    tx.objectStore(
+      "maintenanceRecords"
+    );
+
+  return await store.getAll();
 
 };

@@ -20,7 +20,10 @@ const useExpenseCRUD = ({
   editingId,
   setEditingId,
 
-  setShowAddModal
+  setShowAddModal,
+
+  newNote,
+  setNewNote
 
 }) => {
 
@@ -41,10 +44,17 @@ const useExpenseCRUD = ({
           exp.id === editingId
             ? {
                 ...exp,
+
                 item: newItem,
+
                 price: parseFloat(newPrice),
+
                 category: newCategory,
-                date: newDate
+
+                date: newDate,
+
+                note: newNote
+
               }
             : exp
         );
@@ -54,11 +64,19 @@ const useExpenseCRUD = ({
       } else {
 
         const newExpense = {
+
           id: crypto.randomUUID(),
+
           item: newItem,
+
           price: parseFloat(newPrice),
+
           category: newCategory,
-          date: newDate
+
+          date: newDate,
+
+          note: newNote
+
         };
 
         updatedExpenses = [
@@ -75,13 +93,15 @@ const useExpenseCRUD = ({
       // reset form
       setNewItem('');
       setNewPrice('');
-      setNewCategory('engine');
+      setNewCategory('');
 
       setNewDate(
         new Date()
           .toISOString()
           .split('T')[0]
       );
+
+      setNewNote('');
 
       setShowAddModal(false);
 
@@ -114,6 +134,10 @@ const useExpenseCRUD = ({
 
     setNewDate(expense.date);
 
+    setNewNote(
+      expense.note || ''
+    );
+
     setEditingId(expense.id);
 
     setShowAddModal(true);
@@ -128,13 +152,15 @@ const useExpenseCRUD = ({
     setNewItem('');
     setNewPrice('');
 
-    setNewCategory('engine');
+    setNewCategory('');
 
     setNewDate(
       new Date()
         .toISOString()
         .split('T')[0]
     );
+
+    setNewNote('');
 
     setShowAddModal(false);
 

@@ -19,7 +19,7 @@ const ImportModal = ({
       }
     >
 
-      <div className="bg-slate-800/95 backdrop-blur-xl rounded-2xl p-6 w-full max-w-2xl border border-white/20 shadow-2xl animate-scaleIn max-h-[90vh] overflow-y-auto">
+      <div className="bg-slate-800/95 backdrop-blur-xl rounded-2xl p-4 w-full max-w-2xl border border-white/20 shadow-2xl animate-scaleIn max-h-[90vh] overflow-y-auto">
 
         <div className="flex items-center justify-between mb-6">
 

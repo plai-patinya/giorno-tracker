@@ -49,13 +49,21 @@ import {
 
 } from "./database/mutationQueue";
 import useCloudSync from "./hooks/useCloudSync";
-
 import { loginUser, registerUser, logoutUser, saveUserData } from "./services/firebaseService";
 window.saveUserData = saveUserData;
 import { useState, useMemo, useEffect } from 'react';
 import { PlusCircle, Trash2, Edit2, PieChart, TrendingUp, Calendar, DollarSign, Package, Award, Activity, Save, X, Check, Download, Upload, RefreshCw, Gauge, Fuel } from 'lucide-react';
+import { getVehicleMood }
+from "./utils/vehicleMood";
+import useMaintenancePersistence
+from "./hooks/useMaintenancePersistence";
+import MaintenanceModal
+from "./components/modals/MaintenanceModal";
 
 const ExpenseTracker = () => {
+
+  useMaintenancePersistence();
+
   const STORAGE_KEY = 'giorno-expenses';
   const FUEL_STORAGE_KEY = 'giorno-fuel-records';
   
@@ -191,16 +199,14 @@ const ExpenseTracker = () => {
   monthlyData,
   stats
 } = useExpenseManager(expenses);
-console.log("🔥 expenses:", expenses);
-console.log("🔥 partsExpense:", partsExpense);
 
   const [newItem, setNewItem] = useState('');
   const [newPrice, setNewPrice] = useState('');
-  const [newCategory, setNewCategory] = useState('engine');
+  const [newCategory, setNewCategory] = useState('');
   const [newDate, setNewDate] = useState(new Date().toISOString().split('T')[0]);
   const [editingId, setEditingId] = useState(null);
   const [selectedMonth, setSelectedMonth] = useState(null);
-
+  const [newNote,setNewNote] = useState("");
 
   const {
 
@@ -254,11 +260,68 @@ console.log("🔥 partsExpense:", partsExpense);
   const [password, setPassword] = useState('');
   const { user, authLoading } = useAuth();
 
-      useEffect(() => {
-    if (user) {
-      window.getUser = () => user;
-    }
-  }, [user]);
+    useEffect(() => {
+
+      if (user) {
+
+        console.log(
+          "👤 UID:",
+          user.uid
+        );
+
+        console.log(
+          "📧 Email:",
+          user.email
+        );
+
+        window.getUser = () => user;
+
+      }
+
+    }, [user]);
+
+    useEffect(() => {
+
+      if (!user) return;
+
+      const testFirestore = async () => {
+
+        try {
+
+          const { doc, getDoc } =
+            await import("firebase/firestore");
+
+          const { db } =
+            await import("./firebase");
+
+          const snap = await getDoc(
+            doc(db, "users", user.uid)
+          );
+
+          console.log(
+            "🔥 TEST FIRESTORE:",
+            snap.exists()
+          );
+
+          console.log(
+            "🔥 DATA:",
+            snap.data()
+          );
+
+        } catch (err) {
+
+          console.error(
+            "🔥 FIRESTORE TEST ERROR:",
+            err
+          );
+
+        }
+
+      };
+
+      testFirestore();
+
+    }, [user]);
 
   //
   // ☁️ CLOUD SYNC
@@ -393,28 +456,47 @@ console.log("🔥 partsExpense:", partsExpense);
 
   } = useModalManager();
 
-const {
-  addExpense,
-  deleteExpense,
-  startEdit,
-  cancelEdit
-} = useExpenseCRUD({
-  expenses,
-  setExpenses,
-  saveExpenses: saveExpenses,
-  newItem,
-  setNewItem,
-  newPrice,
-  setNewPrice,
-  newCategory,
-  setNewCategory,
-  newDate,
-  setNewDate,
-  editingId,
-  setEditingId,
-  setShowAddModal
+  const [
 
-  });
+    showMaintenanceModal,
+
+    setShowMaintenanceModal
+
+  ] = useState(false);
+
+  const isAnyModalOpen =
+
+  showFuelModal ||
+
+  showAddModal ||
+
+  showMaintenanceModal;
+
+  const {
+    addExpense,
+    deleteExpense,
+    startEdit,
+    cancelEdit
+  } = useExpenseCRUD({
+
+    expenses,
+    setExpenses,
+    saveExpenses: saveExpenses,
+    newItem,
+    setNewItem,
+    newPrice,
+    setNewPrice,
+    newCategory,
+    setNewCategory,
+    newDate,
+    setNewDate,
+    editingId,
+    setEditingId,
+    setShowAddModal,
+    newNote,
+    setNewNote
+
+    });
 
   useEffect(() => {
   const init = async () => {
@@ -672,7 +754,7 @@ const {
 
   if (loading || authLoading) {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-900 text-white">
+    <div className="min-h-screen animated-bg flex items-center justify-center text-white">
       <div className="text-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500 mx-auto"></div>
         <p className="mt-4 text-gray-400">กำลังโหลดข้อมูล...</p>
@@ -702,8 +784,48 @@ const {
 
   }
 
+  const vehicleMood =
+  getVehicleMood(
+
+    stats?.vehicleHealth || 82
+
+  );
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 text-white p-4 sm:p-6 pb-24 px-4">
+    <div className="
+      min-h-screen
+      animated-bg
+      text-white
+
+      
+
+      p-4 sm:p-6
+      pb-24
+
+      relative
+    ">
+      {/* PREMIUM GLOW */}
+        <div
+          className={`
+            fixed
+            inset-0
+
+            overflow-hidden
+            pointer-events-none
+
+            bg-gradient-to-br
+
+            ${vehicleMood.glow}
+          `}
+        >
+
+        <div className="absolute top-[-120px] left-[10%] w-[420px] h-[420px] ${vehicleMood.orb} blur-3xl rounded-full animate-float" />
+
+        <div className="absolute bottom-[-150px] right-[5%] w-[380px] h-[380px] ${vehicleMood.orb} blur-3xl rounded-full animate-float" />
+
+      </div>
+      {/* APP CONTENT */}
+      <div className="relative z-10"></div>
       {/* Notification */}
       <NotificationToast
         notification={notification}
@@ -732,6 +854,9 @@ const {
         cancelEdit={cancelEdit}
 
         categories={categories}
+
+        newNote={newNote}
+        setNewNote={setNewNote}
       />
 
       {/* Import Modal */}
@@ -784,7 +909,43 @@ const {
         resetFuelForm={resetFuelForm}
       />
 
-      <div className="max-w-7xl mx-auto">
+      <MaintenanceModal
+
+        isOpen={
+          showMaintenanceModal
+        }
+
+        onClose={() =>
+
+          setShowMaintenanceModal(
+            false
+          )
+
+        }
+
+        currentOdo={
+
+          fuelRecords.length > 0
+
+            ? Math.max(
+
+                ...fuelRecords.map(
+                  (record) =>
+
+                    Number(
+                      record.odometer || 0
+                    )
+                )
+
+              )
+
+            : 0
+
+        }
+
+      />
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 animate-fadeUp">
         
         {/* Header */}
         <Header
@@ -807,26 +968,132 @@ const {
         />
 
         {/* View Tabs */}
-        <div className="grid grid-cols-4 gap-2 mb-6 bg-white/5 backdrop-blur-xl p-2 rounded-2xl border border-white/10">
+        <div
+          className="
+          sticky
+          top-3
+          z-50
+
+          mb-8
+
+          grid grid-cols-4 gap-2
+
+          p-2
+
+          rounded-3xl
+
+          backdrop-blur-2xl
+          backdrop-saturate-150
+          bg-black/10
+
+          border ${vehicleMood.border}
+
+          shadow-[0_10px_40px_rgba(0,0,0,0.35)]
+
+          overflow-hidden
+
+          supports-[backdrop-filter]:bg-black/10
+          "
+        >
+
           {[
             { id: 'dashboard', icon: Activity, label: 'Dashboard' },
             { id: 'fuel', icon: Gauge, label: 'ระยะทาง/น้ำมัน' },
             { id: 'timeline', icon: Calendar, label: 'Timeline' },
             { id: 'list', icon: Package, label: 'รายการ' }
-          ].map(tab => (
-            <button
-              key={tab.id}
-              onClick={() => setView(tab.id)}
-              className={`flex items-center justify-center gap-2 px-2 sm:px-4 py-3 rounded-xl font-semibold text-xs sm:text-base transition-all ${
-                view === tab.id
-                  ? 'bg-gradient-to-r from-orange-500 to-red-500 shadow-lg scale-105'
-                  : 'hover:bg-white/5'
-              }`}
-            >
-              <tab.icon size={16} className="sm:w-5 sm:h-5" />
-              <span className="hidden lg:inline">{tab.label}</span>
-            </button>
-          ))}
+          ].map((tab) => {
+
+            const isActive = view === tab.id;
+
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setView(tab.id)}
+
+                className={`
+                  relative
+
+                  flex items-center justify-center gap-2
+
+                  px-2 sm:px-4
+                  py-3 sm:py-4
+
+                  rounded-2xl
+
+                  font-semibold
+
+                  text-xs sm:text-sm lg:text-base
+
+                  transition-all duration-300 ease-out
+
+                  overflow-hidden
+
+                  ${isActive
+                    ? `
+                      bg-gradient-to-r
+                      from-orange-400
+                      via-orange-500
+                      to-pink-500
+
+                      text-white
+
+                      shadow-[0_0_30px_rgba(255,120,80,0.45)]
+
+                      scale-[1.02]
+                    `
+                    : `
+                      text-white/70
+
+                      hover:text-white
+
+                      hover:bg-white/5
+
+                      hover:scale-[1.01]
+                    `
+                  }
+                `}
+              >
+
+                {/* Glow Layer */}
+                {isActive && (
+                  <div
+                    className="
+                    absolute inset-0
+
+                    bg-white/10
+
+                    animate-float
+
+                    pointer-events-none
+                    "
+                  />
+                )}
+
+                {/* Icon */}
+                <tab.icon
+                  size={16}
+                  className="
+                  relative z-10
+                  sm:w-5 sm:h-5
+                  "
+                />
+
+                {/* Label */}
+                <span
+                  className="
+                  relative z-10
+
+                  hidden md:inline
+                  "
+                >
+                  {tab.label}
+                </span>
+
+              </button>
+            );
+
+          })}
+
         </div>
 
         {/* Fuel/Distance View */}
@@ -847,7 +1114,7 @@ const {
         )}
 
         {/* Dashboard View */}
-        {view === 'dashboard' && (
+        {view === "dashboard" && (
           <DashboardView
             BIKE_BASE_PRICE={BIKE_BASE_PRICE}
             stats={stats}
@@ -866,6 +1133,24 @@ const {
             }
           />
         )}
+
+
+        {/* 🔥 FORCE DEBUG */}
+{/*         <DashboardView
+          BIKE_BASE_PRICE={BIKE_BASE_PRICE}
+          stats={stats}
+          partsExpense={partsExpense}
+          totalExpense={totalExpense}
+          monthlyData={monthlyData}
+          categoryTotals={categoryTotals}
+          categories={categories}
+          expenses={expenses}
+          fuelRecords={fuelRecords}
+          serviceHistory={serviceHistory}
+          setServiceHistory={setServiceHistory}
+          user={user}
+          saveServiceHistoryWithSync={saveServiceHistoryWithSync}
+        /> */}
 
         {/* Timeline & List views remain the same */}
         {view === 'list' && (
@@ -912,6 +1197,8 @@ const {
 
         setShowFuelModal={setShowFuelModal}
         setShowAddModal={setShowAddModal}
+        setShowMaintenanceModal={setShowMaintenanceModal}
+        isAnyModalOpen={isAnyModalOpen}
       />
     </div>
   );

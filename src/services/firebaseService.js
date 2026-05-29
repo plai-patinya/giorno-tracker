@@ -59,11 +59,21 @@ import {
     serviceHistory
   ) => {
 
-    await setDoc(doc(db, "users", uid), {
-      expenses,
-      fuelRecords,
-      serviceHistory
-    });
+    await setDoc(
+
+      doc(db, "users", uid),
+
+      {
+        expenses,
+        fuelRecords,
+        serviceHistory
+      },
+
+      {
+        merge: true
+      }
+
+    );
 
   };
 
@@ -117,8 +127,6 @@ export const subscribeUserData = (
       if (snap.exists()) {
 
         const data = snap.data();
-
-        console.log("☁️ Cloud data:", data);
 
         const safeArray = (value) => {
           if (Array.isArray(value)) return value;

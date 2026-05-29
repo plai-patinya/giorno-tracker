@@ -24,7 +24,7 @@ const FuelView = ({
           <div className="space-y-6">
             {/* Digital Speedometer Dashboard */}
             {fuelStats ? (
-              <div className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-xl rounded-3xl p-6 sm:p-8 border border-white/10 shadow-2xl">
+              <div className="bg-white/5 backdrop-blur-3xl border border-white/10 shadow-[0_0_60px_rgba(168,85,247,0.15)] backdrop-blur-xl rounded-3xl p-6 sm:p-8 border border-white/10 shadow-2xl">
                 <div className="flex flex-col items-center">
                   {/* Speedometer Circle */}
                   <div className="relative w-64 h-64 sm:w-80 sm:h-80 mb-8">
@@ -51,9 +51,9 @@ const FuelView = ({
                       />
                       <defs>
                         <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                          <stop offset="0%" stopColor="#10b981" />
-                          <stop offset="50%" stopColor="#f59e0b" />
-                          <stop offset="100%" stopColor="#ef4444" />
+                          <stop offset="0%" stopColor="#8b5cf6" />
+                          <stop offset="50%" stopColor="#a855f7" />
+                          <stop offset="100%" stopColor="#ec4899" />
                         </linearGradient>
                       </defs>
                     </svg>
@@ -128,13 +128,58 @@ const FuelView = ({
             {/* Fuel Records List */}
             {fuelRecords.length > 0 && (
               <div className="bg-white/5 backdrop-blur-xl rounded-2xl p-4 sm:p-6 border border-white/10 shadow-2xl">
-                <h3 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6 flex items-center gap-2">
-                  <Fuel className="text-green-400" />
-                  ประวัติการเติมน้ำมัน
-                </h3>
+                <div className="mb-6">
+                  <h3 className="text-2xl font-black flex items-center gap-3">
+                    <Fuel className="text-fuchsia-400" />
+                    Fuel Intelligence Timeline
+                  </h3>
+                  <div className="text-sm text-white/50 mt-1">
+                    วิเคราะห์จากข้อมูลการเติมน้ำมันจริง
+                  </div>
+                </div>
                 <div className="space-y-3">
-                  {[...fuelRecords].reverse().map((record) => (
-                    <div key={record.id} className="bg-white/5 rounded-xl p-4 border border-white/10 hover:border-green-500/50 transition-all group">
+
+                  {[...fuelRecords]
+
+                    .sort((a, b) => {
+
+                      const dateDiff =
+                        new Date(b.date) -
+                        new Date(a.date);
+
+                      if (dateDiff !== 0)
+                        return dateDiff;
+
+                      return (
+                        b.odometer -
+                        a.odometer
+                      );
+
+                    })
+
+                    .map((record) => (
+
+                    <div key={record.id} className="
+                        bg-gradient-to-br
+                        from-white/5
+                        to-white/[0.02]
+
+                        backdrop-blur-2xl
+
+                        rounded-2xl
+
+                        p-4
+
+                        border border-white/10
+
+                        hover:border-fuchsia-500/40
+
+                        hover:shadow-[0_0_25px_rgba(168,85,247,0.2)]
+
+                        transition-all duration-300
+
+                        group
+                        ">
                       <div className="flex items-start justify-between gap-3 mb-3">
                         <div className="flex-1">
                           <div className="flex items-center gap-2 mb-2">
@@ -146,7 +191,7 @@ const FuelView = ({
                           </div>
                           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-sm">
                             <div>
-                              <div className="text-gray-400 text-xs">ระยะทาง</div>
+                              <div className="text-gray-400 text-xs">เลขไมล์</div>
                               <div className="font-bold">{record.odometer.toLocaleString()} กม.</div>
                             </div>
                             <div>

@@ -6,7 +6,7 @@ const useUIStore = create((set) => ({
   view: "dashboard",
 
   setView: (view) =>
-    set({ view }),
+    set({ view: (view || "dashboard").toLowerCase() }),
 
   // 🔍 Search
   searchTerm: "",
@@ -15,7 +15,7 @@ const useUIStore = create((set) => ({
     set({ searchTerm }),
 
   // ⏳ Loading
-  loading: true,
+  loading: false,
 
   setLoading: (loading) =>
     set({ loading })

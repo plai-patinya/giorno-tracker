@@ -28,8 +28,6 @@ const useCloudSync = ({
 
     if (!user) return;
 
-    console.log("🔄 Subscribing to cloud...");
-
     const unsub = subscribeUserData(
       user.uid,
       setExpenses,
@@ -67,9 +65,7 @@ const useCloudSync = ({
       return;
     }
 
-  const timer = setTimeout(() => {
-
-    console.log("☁️ SAFE SAVE");
+  const timer = setTimeout(async () => {
 
     // ✅ กัน type พัง
     if (
@@ -86,12 +82,44 @@ const useCloudSync = ({
     const safeFuel = JSON.parse(JSON.stringify(fuelRecords));
     const safeService = JSON.parse(JSON.stringify(serviceHistory));
 
-    saveUserData(
+    try {
+
+      console.log(
+        "⛽ SAFE FUEL:",
+        safeFuel
+      );
+
+      console.log(
+        "🧾 SAFE EXPENSES:",
+        safeExpenses
+      );
+
+    await saveUserData(
+
       user.uid,
+
       safeExpenses,
+
       safeFuel,
+
       safeService
+
     );
+
+    console.log(
+      "☁️ Cloud saved"
+    );
+
+  }
+
+  catch (error) {
+
+    console.error(
+      "❌ Cloud save failed:",
+      error
+    );
+
+  }
 
   }, 2000);
 

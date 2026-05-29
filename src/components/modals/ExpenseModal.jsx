@@ -1,133 +1,344 @@
 import {
-  PlusCircle,
-  Edit2,
+
+  X,
+
   Save,
-  X
+
+  Receipt,
+
+  Calendar,
+
+  Package,
+
+  Wallet,
+
+  FileText
+
 } from "lucide-react";
 
-const ExpenseModal = ({
-  showAddModal,
-  setShowAddModal,
+const inputStyle = `
 
-  editingId,
+  w-full
+  mt-2
 
-  newItem,
-  setNewItem,
+  rounded-2xl
 
-  newPrice,
-  setNewPrice,
+  bg-white/5
 
-  newCategory,
-  setNewCategory,
+  border border-white/10
 
-  newDate,
-  setNewDate,
+  px-4 py-3
 
-  addExpense,
-  cancelEdit,
+  outline-none
 
-  categories
-}) => {
+  text-white
 
-  if (!showAddModal) return null;
+  backdrop-blur-xl
+
+  focus:border-pink-400
+  focus:bg-white/10
+
+  transition-all
+
+  placeholder:text-white/30
+
+`;
+
+  const ExpenseModal = ({
+
+    showAddModal,
+    setShowAddModal,
+
+    editingId,
+
+    newItem,
+    setNewItem,
+
+    newPrice,
+    setNewPrice,
+
+    newCategory,
+    setNewCategory,
+
+    newDate,
+    setNewDate,
+
+    addExpense,
+    cancelEdit,
+
+    categories = {},
+
+    newNote,
+    setNewNote,
+
+  }) => {
+
+
+  //
+  // 🚫 CLOSED
+  //
+
+  if (!showAddModal)
+    return null;
+
+  //
+  // ❌ CLOSE
+  //
+
+  const handleClose = () => {
+
+    setShowAddModal(false);
+
+  };
 
   return (
+
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn"
-      onClick={(e) =>
-        e.target === e.currentTarget && cancelEdit()
-      }
+
+      className="
+
+        fixed inset-0
+
+        z-[9999]
+
+        flex items-center justify-center
+
+        bg-black/60
+
+        backdrop-blur-md
+
+        p-4
+
+      "
+
     >
 
-      <div className="bg-slate-800/95 backdrop-blur-xl rounded-2xl p-6 w-full max-w-2xl border border-white/20 shadow-2xl animate-scaleIn max-h-[80vh] overflow-y-auto">
+      <div
 
-        <div className="flex items-center justify-between mb-6">
+        className="
 
-          <div className="flex items-center gap-3">
+          w-full max-w-2xl
 
-            {editingId ? (
-              <Edit2 className="text-blue-400" size={24} />
-            ) : (
-              <PlusCircle className="text-orange-400" size={24} />
-            )}
+          rounded-3xl
 
-            <h3 className="text-2xl font-bold">
-              {editingId ? 'แก้ไขรายการ' : 'เพิ่มรายการใหม่'}
-            </h3>
+          border border-white/10
 
-          </div>
+          bg-[#12071f]/95
 
-          <button
-            onClick={cancelEdit}
-            className="p-2 hover:bg-white/10 rounded-lg transition-all"
-          >
-            <X size={24} />
-          </button>
+          backdrop-blur-2xl
 
-        </div>
+          shadow-[0_0_80px_rgba(255,120,80,0.20)]
 
-        <div className="space-y-4">
+          overflow-hidden
 
-          <div>
+          animate-[fadeInUp_0.35s_ease]
 
-            <label className="block text-sm font-medium mb-2 text-gray-300">
-              ชื่อรายการ
-            </label>
+        "
 
-            <input
-              type="text"
-              placeholder="เช่น ท่อผ่า, โช้คหลัง"
-              value={newItem}
-              onChange={(e) => setNewItem(e.target.value)}
-              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition-all"
-              onKeyPress={(e) => e.key === 'Enter' && addExpense()}
-              autoFocus
-            />
+      >
 
-          </div>
+        {/* HEADER */}
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div
 
-            <div>
+          className="
 
-              <label className="block text-sm font-medium mb-2 text-gray-300">
-                ราคา (บาท)
-              </label>
+            flex items-center justify-between
 
-              <input
-                type="number"
-                placeholder="0"
-                value={newPrice}
-                onChange={(e) => setNewPrice(e.target.value)}
-                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition-all"
-                onKeyPress={(e) => e.key === 'Enter' && addExpense()}
-              />
+            px-6 py-5
+
+            border-b border-white/10
+
+          "
+
+        >
+
+          <div className="flex items-center gap-4">
+
+            <div
+
+              className="
+
+                w-12 h-12
+
+                rounded-2xl
+
+                bg-gradient-to-br
+
+                from-orange-400
+                via-pink-500
+                to-fuchsia-500
+
+                flex items-center justify-center
+
+                shadow-[0_0_30px_rgba(255,120,80,0.35)]
+
+              "
+
+            >
+
+              <Receipt />
 
             </div>
 
             <div>
 
-              <label className="block text-sm font-medium mb-2 text-gray-300">
+              <div className="text-2xl font-black">
+
+                {editingId
+
+                  ? "Edit Expense"
+
+                  : "Expense Record"}
+
+              </div>
+
+              <div className="text-white/50 text-sm">
+
+                เพิ่มข้อมูลค่าใช้จ่ายและของแต่งรถ
+
+              </div>
+
+            </div>
+
+          </div>
+
+          <button
+
+            onClick={cancelEdit}
+
+            className="
+
+              w-10 h-10
+
+              rounded-xl
+
+              bg-white/5
+
+              hover:bg-white/10
+
+              transition-all
+
+              flex items-center justify-center
+
+            "
+
+          >
+
+            <X size={18} />
+
+          </button>
+
+        </div>
+
+        {/* BODY */}
+
+        <div className="p-6 space-y-5">
+
+          {/* DATE */}
+
+          <div>
+
+            <label className="text-sm text-white/60 flex items-center gap-2">
+
+              <Calendar size={14} />
+
+              วันที่
+
+            </label>
+
+            <input
+              type="date"
+              value={newDate}
+              onChange={(e) =>
+                setNewDate(
+                  e.target.value
+                )
+              }
+              className={inputStyle}
+            />
+
+          </div>
+
+          {/* TITLE */}
+
+          <div>
+
+            <label className="text-sm text-white/60 flex items-center gap-2">
+
+              <Package size={14} />
+
+              รายการ
+
+            </label>
+
+            <input
+              type="text"
+              placeholder="เช่น ท่อแต่ง / โช๊ค / น้ำมันเครื่อง"
+              value={newItem}
+              onChange={(e) =>
+                setNewItem(
+                  e.target.value
+                )
+              }
+              className={inputStyle}
+            />
+
+          </div>
+
+          {/* CATEGORY + PRICE */}
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+
+            <div>
+
+              <label className="text-sm text-white/60">
+
                 หมวดหมู่
+
               </label>
 
               <select
                 value={newCategory}
-                onChange={(e) => setNewCategory(e.target.value)}
-                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition-all"
+                onChange={(e) =>
+                  setNewCategory(
+                    e.target.value
+                  )
+                }
+                className={inputStyle}
               >
 
-                {Object.entries(categories)
-                  .filter(([key]) => key !== 'base')
-                  .map(([key, cat]) => (
-                    <option
-                      key={key}
-                      value={key}
-                      className="bg-slate-800"
-                    >
-                      {cat.icon} {cat.name}
-                    </option>
-                  ))}
+                <option
+
+                  value=""
+
+                  className="bg-[#14091f] text-white"
+
+                >
+
+                  Select Category
+
+                </option>
+
+                {Object.entries(
+                  categories || {}
+                ).map(([key, category]) => (
+
+                  <option
+
+                    key={key}
+
+                    value={key}
+
+                    className="bg-[#14091f] text-white"
+
+                  >
+
+                    {category?.name || key}
+
+                  </option>
+
+                ))}
 
               </select>
 
@@ -135,48 +346,220 @@ const ExpenseModal = ({
 
             <div>
 
-              <label className="block text-sm font-medium mb-2 text-gray-300">
-                วันที่
+              <label className="text-sm text-white/60 flex items-center gap-2">
+
+                <Wallet size={14} />
+
+                ราคา
+
               </label>
 
               <input
-                type="date"
-                value={newDate}
-                onChange={(e) => setNewDate(e.target.value)}
-                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition-all"
+                type="number"
+                placeholder="เช่น 3500"
+                value={newPrice}
+                onChange={(e) =>
+                  setNewPrice(
+                    e.target.value
+                  )
+              }
+                className={inputStyle}
               />
 
             </div>
 
           </div>
 
-          <div className="flex gap-3 pt-4">
+          {/* NOTE */}
 
-            <button
-              onClick={addExpense}
-              disabled={!newItem.trim() || !newPrice || parseFloat(newPrice) <= 0}
-              className="flex-1 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 disabled:from-gray-600 disabled:to-gray-700 disabled:cursor-not-allowed rounded-xl py-3 font-bold transition-all shadow-lg flex items-center justify-center gap-2"
-            >
-              <Save size={20} />
+          <div>
 
-              {editingId ? 'บันทึกการแก้ไข' : 'เพิ่มรายการ'}
+            <label className="text-sm text-white/60 flex items-center gap-2">
 
-            </button>
+              <FileText size={14} />
 
-            <button
-              onClick={cancelEdit}
-              className="px-6 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl py-3 font-bold transition-all"
-            >
-              ยกเลิก
-            </button>
+              หมายเหตุ
+
+            </label>
+
+            <textarea
+
+              rows={4}
+
+              value={newNote}
+
+              onChange={(e) =>
+                setNewNote(
+                  e.target.value
+                )
+              }
+
+              className={inputStyle}
+
+              placeholder="รายละเอียดเพิ่มเติม..."
+
+            />
 
           </div>
+
+          {/* TOTAL PREVIEW */}
+
+          <div
+
+            className="
+
+              rounded-2xl
+
+              border border-pink-500/20
+
+              bg-pink-500/10
+
+              p-5
+
+              backdrop-blur-xl
+
+            "
+
+          >
+
+            <div className="text-sm text-pink-300 font-semibold">
+
+              Expense Summary
+
+            </div>
+
+            <div className="mt-2 text-3xl font-black text-white">
+
+              ฿{Number(
+                newPrice || 0
+              ).toLocaleString()}
+
+            </div>
+
+            <div className="mt-2 text-sm text-white/60">
+
+              ระบบจะนำข้อมูลนี้ไปวิเคราะห์
+              Vehicle Cost,
+              Budget Analytics,
+              AI Recommendation
+              และแนวโน้มค่าใช้จ่ายแบบ real-time
+
+            </div>
+
+          </div>
+
+        </div>
+
+        {/* FOOTER */}
+
+        <div
+
+          className="
+
+            px-6 py-5
+
+            border-t border-white/10
+
+            flex justify-end gap-3
+
+          "
+
+        >
+
+          <button
+
+            onClick={handleClose}
+
+            className="
+
+              px-5 py-3
+
+              rounded-2xl
+
+              border border-white/10
+
+              bg-white/5
+
+              hover:bg-white/10
+
+              transition-all
+
+              font-semibold
+
+            "
+
+          >
+
+            Cancel
+
+          </button>
+
+          <button
+
+            onClick={() => {
+
+              addExpense()
+
+            }}
+
+            disabled={
+
+              !newItem ||
+
+              !newPrice ||
+
+              Number(
+                newPrice
+              ) <= 0
+
+            }
+
+            className="
+
+              px-6 py-3
+
+              rounded-2xl
+
+              bg-gradient-to-r
+
+              from-orange-400
+              via-pink-500
+              to-fuchsia-500
+
+              font-bold
+
+              shadow-[0_0_30px_rgba(255,120,80,0.35)]
+
+              hover:scale-[1.03]
+
+              transition-all
+
+              disabled:opacity-40
+              disabled:cursor-not-allowed
+              disabled:hover:scale-100
+
+              flex items-center gap-2
+
+            "
+
+          >
+
+            <Save size={18} />
+
+            {editingId
+
+              ? "Save Changes"
+
+              : "Save Expense"}
+
+          </button>
 
         </div>
 
       </div>
 
     </div>
+
   );
 
 };
