@@ -84,16 +84,6 @@ const useCloudSync = ({
 
     try {
 
-      console.log(
-        "⛽ SAFE FUEL:",
-        safeFuel
-      );
-
-      console.log(
-        "🧾 SAFE EXPENSES:",
-        safeExpenses
-      );
-
     await saveUserData(
 
       user.uid,

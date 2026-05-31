@@ -30,7 +30,6 @@ import useExpenseStore from "./store/useExpenseStore";
 import useFuelStore from "./store/useFuelStore";
 import useExpensesQuery from "./queries/useExpensesQuery";
 import useSaveExpensesMutation from "./queries/useSaveExpensesMutation";
-import useSaveFuelMutation from "./queries/useSaveFuelMutation";
 import {
 
   saveExpensesToDB,
@@ -260,69 +259,6 @@ const ExpenseTracker = () => {
   const [password, setPassword] = useState('');
   const { user, authLoading } = useAuth();
 
-    useEffect(() => {
-
-      if (user) {
-
-        console.log(
-          "👤 UID:",
-          user.uid
-        );
-
-        console.log(
-          "📧 Email:",
-          user.email
-        );
-
-        window.getUser = () => user;
-
-      }
-
-    }, [user]);
-
-    useEffect(() => {
-
-      if (!user) return;
-
-      const testFirestore = async () => {
-
-        try {
-
-          const { doc, getDoc } =
-            await import("firebase/firestore");
-
-          const { db } =
-            await import("./firebase");
-
-          const snap = await getDoc(
-            doc(db, "users", user.uid)
-          );
-
-          console.log(
-            "🔥 TEST FIRESTORE:",
-            snap.exists()
-          );
-
-          console.log(
-            "🔥 DATA:",
-            snap.data()
-          );
-
-        } catch (err) {
-
-          console.error(
-            "🔥 FIRESTORE TEST ERROR:",
-            err
-          );
-
-        }
-
-      };
-
-      testFirestore();
-
-    }, [user]);
-
   //
   // ☁️ CLOUD SYNC
   //
@@ -351,9 +287,6 @@ const ExpenseTracker = () => {
   const saveExpensesMutation =
   useSaveExpensesMutation(user);
 
-  const saveFuelMutation =
-  useSaveFuelMutation(user);
-
   const saveExpensesWithSync =
   async (data) => {
 
@@ -370,9 +303,6 @@ const ExpenseTracker = () => {
 
     // local backup
     saveFuelRecords(data);
-
-    // cloud sync
-    saveFuelMutation.mutate(data);
 
   };
 

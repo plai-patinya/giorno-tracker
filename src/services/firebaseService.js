@@ -133,7 +133,10 @@ export const subscribeUserData = (
           return [];
         };
         setExpenses(safeArray(data?.expenses));
-        setFuelRecords(safeArray(data?.fuelRecords));
+
+        setFuelRecords(
+          safeArray(data?.fuelRecords)
+        );
         setServiceHistory(safeArray(data?.serviceHistory));
         setCloudLoaded(true);
       } else {
