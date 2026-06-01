@@ -22,7 +22,8 @@ export const createMaintenanceRecord = () => ({
 
   date: "",
 
-  odometer: 0,
+  serviceOdometer: 0,
+  nextServiceKm: "",
 
   //
   // 💰 COST

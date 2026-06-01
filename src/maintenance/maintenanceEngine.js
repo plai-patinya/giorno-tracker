@@ -15,14 +15,17 @@ export const getLatestService = (
     .filter(
       (record) =>
 
-        record.type === type
+        record.category === type
     )
 
     .sort(
       (a, b) =>
-
-        b.odometer -
-        a.odometer
+        Number(
+          b.serviceOdometer || 0
+        ) -
+        Number(
+          a.serviceOdometer || 0
+        )
     )[0];
 
 };

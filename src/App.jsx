@@ -28,6 +28,8 @@ import "./styles/animations.css";
 import useUIStore from "./store/useUIStore";
 import useExpenseStore from "./store/useExpenseStore";
 import useFuelStore from "./store/useFuelStore";
+import useMaintenanceStore
+from "./store/useMaintenanceStore";
 import useExpensesQuery from "./queries/useExpensesQuery";
 import useSaveExpensesMutation from "./queries/useSaveExpensesMutation";
 import {
@@ -58,6 +60,7 @@ import useMaintenancePersistence
 from "./hooks/useMaintenancePersistence";
 import MaintenanceModal
 from "./components/modals/MaintenanceModal";
+
 
 const ExpenseTracker = () => {
 
@@ -113,6 +116,14 @@ const ExpenseTracker = () => {
 
   } = useFuelStore();
 
+  const {
+
+    maintenanceRecords,
+
+    setMaintenanceRecords
+
+  } = useMaintenanceStore();
+
   //
   // 🕘 SERVICE HISTORY
   //
@@ -141,7 +152,7 @@ const ExpenseTracker = () => {
 
       {
 
-        type: "oil",
+        type: "Engine Oil",
 
         icon: "🛢️",
 
@@ -268,10 +279,10 @@ const ExpenseTracker = () => {
     loading,
     expenses,
     fuelRecords,
-    serviceHistory,
+    maintenanceRecords,
     setExpenses,
     setFuelRecords,
-    setServiceHistory
+    setMaintenanceRecords
   });
 
   //const {
@@ -324,7 +335,7 @@ const ExpenseTracker = () => {
 
     const safeExpenses = JSON.parse(JSON.stringify(expenses));
     const safeFuel = JSON.parse(JSON.stringify(fuelRecords));
-    const safeService = JSON.parse(JSON.stringify(serviceHistory));
+    const safeService = JSON.parse(JSON.stringify(maintenanceRecords));
 
     await saveUserData(
       user.uid,
@@ -1055,8 +1066,8 @@ const ExpenseTracker = () => {
             categories={categories}
             expenses={expenses}
             fuelRecords={fuelRecords}
-            serviceHistory={serviceHistory}
-            setServiceHistory={setServiceHistory}
+            serviceHistory={maintenanceRecords}
+            setServiceHistory={setMaintenanceRecords}
             user={user}
             saveServiceHistoryWithSync={
               saveServiceHistoryWithSync

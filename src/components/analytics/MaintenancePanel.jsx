@@ -1,199 +1,97 @@
 import {
-
-  calculateService,
-  getServiceStatus,
-  getRecommendation,
-  estimateDaysLeft
-
-} from "../../utils/maintenance";
+  Wrench,
+  Car,
+  Battery,
+  Disc,
+  ShieldCheck,
+  AlertTriangle
+} from "lucide-react";
 
 const MaintenancePanel = ({
-
-  fuelRecords = [],
-  serviceHistory = []
-
+  maintenanceAnalytics
 }) => {
 
-  //
-  // 🚗 MOCK CURRENT ODO
-  //
+  if (!maintenanceAnalytics) {
+    return null;
+  }
 
-  const currentOdo =
+  const {
+    oil,
+    tires,
+    brakes,
+    battery,
+    maintenanceHealth
+  } = maintenanceAnalytics;
 
-    fuelRecords.length > 0
+  const services = [
 
-      ? Math.max(
-          ...fuelRecords.map(
-            (r) => Number(r.odometer || 0)
-          )
-        )
-
-      : 18500;
-
-  //
-  // 🛠️ MAINTENANCE CONFIG
-  //
-
-  const maintenanceRecords = {
-
-    oil: {
-
-      lastOdo: 15000,
-
-      intervalKm: 3000
-
+    {
+      title: "Engine Oil",
+      icon: <Wrench size={18} />,
+      data: oil
     },
 
-    airFilter: {
-
-      lastOdo: 12000,
-
-      intervalKm: 12000
-
+    {
+      title: "Tires",
+      icon: <Car size={18} />,
+      data: tires
     },
 
-    tires: {
+    {
+      title: "Brake Pads",
+      icon: <Disc size={18} />,
+      data: brakes
+    },
 
-      lastOdo: 5000,
+    {
+      title: "Battery",
+      icon: <Battery size={18} />,
+      data: battery
+    }
 
-      intervalKm: 20000
+  ];
+
+  const getStatusColor = (status) => {
+
+    switch (status) {
+
+      case "healthy":
+        return {
+          badge:
+            "bg-emerald-500/15 text-emerald-300 border-emerald-500/30",
+          progress:
+            "from-emerald-500 to-green-400"
+        };
+
+      case "warning":
+        return {
+          badge:
+            "bg-yellow-500/15 text-yellow-300 border-yellow-500/30",
+          progress:
+            "from-yellow-500 to-orange-400"
+        };
+
+      case "critical":
+        return {
+          badge:
+            "bg-red-500/15 text-red-300 border-red-500/30",
+          progress:
+            "from-red-500 to-pink-500"
+        };
+
+      default:
+        return {
+          badge:
+            "bg-white/10 text-white/60 border-white/10",
+          progress:
+            "from-slate-500 to-slate-400"
+        };
 
     }
 
   };
 
-  //
-  // 🛠️ SERVICE ENGINE
-  //
-
-  const oilService =
-
-    calculateService(
-
-      currentOdo,
-
-      maintenanceRecords.oil.lastOdo,
-
-      maintenanceRecords.oil.intervalKm
-
-    );
-
-  const airService =
-
-    calculateService(
-
-      currentOdo,
-
-      maintenanceRecords.airFilter.lastOdo,
-
-      maintenanceRecords.airFilter.intervalKm
-
-    );
-
-  const tireService =
-
-    calculateService(
-
-      currentOdo,
-
-      maintenanceRecords.tires.lastOdo,
-
-      maintenanceRecords.tires.intervalKm
-
-    );
-
-  //
-  // 🚨 STATUS
-  //
-
-  const oilStatus =
-    getServiceStatus(
-      oilService.progress
-    );
-
-  const airStatus =
-    getServiceStatus(
-      airService.progress
-    );
-
-  const tireStatus =
-    getServiceStatus(
-      tireService.progress
-    );
-
-  //
-  // 🔔 ALERTS
-  //
-
-  const notifications = [];
-
-  if (oilService.remainingKm <= 500) {
-
-    notifications.push({
-
-      icon: "🛢️",
-
-      title:
-        oilService.remainingKm <= 150
-
-          ? "ถึงรอบเปลี่ยนน้ำมันเครื่อง"
-
-          : "ใกล้ถึงรอบเปลี่ยนน้ำมันเครื่อง",
-
-      description:
-        `เหลืออีก ${oilService.remainingKm.toLocaleString()} km`
-
-    });
-
-  }
-
-  if (airService.remainingKm <= 800) {
-
-    notifications.push({
-
-      icon: "🌬️",
-
-      title:
-        "ควรตรวจไส้กรองอากาศ",
-
-      description:
-        `เหลืออีก ${airService.remainingKm.toLocaleString()} km`
-
-    });
-
-  }
-
-  if (tireService.remainingKm <= 2000) {
-
-    notifications.push({
-
-      icon: "🛞",
-
-      title:
-        "อายุยางใกล้ครบระยะ",
-
-      description:
-        `เหลืออีก ${tireService.remainingKm.toLocaleString()} km`
-
-    });
-
-  }
-
-  //
-  // 🧩 SERVICE CARD
-  //
-
-  const ServiceCard = ({
-
-    title,
-    icon,
-
-    service,
-    status,
-
-    color
-
-  }) => (
+  return (
 
     <div
       className="
@@ -201,247 +99,313 @@ const MaintenancePanel = ({
         border border-white/10
         bg-white/5
         backdrop-blur-xl
-        p-5
+        p-6
+        space-y-6
       "
     >
 
-      <div className="flex items-center justify-between mb-4">
+      {/* HEADER */}
 
-        <div className="flex items-center gap-3">
+      <div className="flex items-center justify-between">
 
-          <div className="text-3xl">
+        <div>
 
-            {icon}
+          <h2
+            className="
+              text-2xl
+              font-black
+              text-white
+            "
+          >
+            🛠 Maintenance Intelligence
+          </h2>
 
-          </div>
-
-          <div>
-
-            <div className="font-black text-lg text-white">
-
-              {title}
-
-            </div>
-
-            <div
-              className={`
-                text-sm
-                ${status.color}
-              `}
-            >
-
-              {status.label}
-
-            </div>
-
-          </div>
+          <p
+            className="
+              text-sm
+              text-white/50
+              mt-1
+            "
+          >
+            ระบบวิเคราะห์การบำรุงรักษารถแบบ Real-Time
+          </p>
 
         </div>
 
         <div
-          className={`
-            px-3 py-1 rounded-full
-            text-xs font-bold
-
-            ${status.bg}
-            ${status.border}
-            border
-          `}
+          className="
+            px-4 py-3
+            rounded-2xl
+            border border-white/10
+            bg-white/5
+            text-center
+          "
         >
 
-          {service.remainingKm.toLocaleString()} km
-
-        </div>
-
-      </div>
-
-      {/* PROGRESS */}
-
-      <div className="mb-3">
-
-        <div className="flex justify-between text-sm text-white/50 mb-2">
-
-          <span>Progress</span>
-
-          <span>
-
-            {Math.round(
-              service.progress
-            )}%
-
-          </span>
-
-        </div>
-
-        <div className="h-3 rounded-full bg-white/10 overflow-hidden">
+          <div
+            className="
+              text-xs
+              text-white/50
+            "
+          >
+            Vehicle Health
+          </div>
 
           <div
-            className={`
-              h-full rounded-full
-
-              ${color}
-
-              transition-all duration-700
-            `}
-            style={{
-              width:
-                `${service.progress}%`
-            }}
-          />
-
-        </div>
-
-      </div>
-
-      {/* RECOMMEND */}
-
-      <div className="text-sm text-white/70">
-
-        {getRecommendation(
-          service.progress,
-          title
-        )}
-
-      </div>
-
-      <div className="text-xs text-white/40 mt-2">
-
-        ประมาณ
-        {" "}
-        {
-          estimateDaysLeft(
-            service.remainingKm
-          )
-        }
-        {" "}
-        วัน
-
-      </div>
-
-    </div>
-
-  );
-
-  return (
-
-    <div className="space-y-6">
-
-      {/* HEADER */}
-
-      <div className="flex items-center gap-4">
-
-        <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-orange-500/20 to-red-500/10 border border-white/10 flex items-center justify-center text-2xl">
-
-          🛠️
-
-        </div>
-
-        <div>
-
-          <h3 className="text-3xl font-black text-white">
-
-            Smart Maintenance
-
-          </h3>
-
-          <div className="text-sm text-white/50">
-
-            ระบบดูแลรักษารถอัจฉริยะ
-
+            className="
+              text-2xl
+              font-black
+              text-white
+            "
+          >
+            {maintenanceHealth}/100
           </div>
 
         </div>
 
       </div>
 
-      {/* ALERTS */}
+      {/* SERVICE GRID */}
 
-      {notifications.length > 0 && (
+      <div
+        className="
+          grid
+          grid-cols-1
+          xl:grid-cols-2
+          gap-4
+        "
+      >
 
-        <div className="space-y-3">
+        {services.map((service) => {
 
-          {notifications.map(
-            (item, index) => (
+          const color =
+            getStatusColor(
+              service.data?.status
+            );
+
+          return (
+
+            <div
+              key={service.title}
+              className="
+                rounded-2xl
+                border border-white/10
+                bg-white/5
+                p-5
+              "
+            >
 
               <div
-                key={index}
-
                 className="
-                  rounded-2xl
-                  border border-yellow-500/20
-                  bg-yellow-500/10
-                  p-4
+                  flex
+                  items-center
+                  justify-between
+                  mb-4
                 "
               >
 
-                <div className="font-bold text-yellow-300">
+                <div
+                  className="
+                    flex
+                    items-center
+                    gap-3
+                  "
+                >
 
-                  {item.icon} {item.title}
+                  <div
+                    className="
+                      w-10 h-10
+                      rounded-xl
+                      bg-white/5
+                      flex items-center justify-center
+                      text-white
+                    "
+                  >
+                    {service.icon}
+                  </div>
+
+                  <div>
+
+                    <div
+                      className="
+                        text-white
+                        font-bold
+                      "
+                    >
+                      {service.title}
+                    </div>
+
+                    <div
+                      className="
+                        text-xs
+                        text-white/50
+                      "
+                    >
+                      Remaining
+                    </div>
+
+                  </div>
 
                 </div>
 
-                <div className="text-sm text-white/70 mt-1">
+                <div
+                  className={`
+                    px-3 py-1
+                    rounded-full
+                    border
+                    text-xs font-bold
+                    ${color.badge}
+                  `}
+                >
 
-                  {item.description}
+                  {service.data?.remainingKm ??
+                    "N/A"} km
 
                 </div>
 
               </div>
 
-            )
-          )}
+              {/* PROGRESS */}
+
+              <div
+                className="
+                  h-2
+                  rounded-full
+                  bg-white/10
+                  overflow-hidden
+                "
+              >
+
+                <div
+                  className={`
+                    h-full
+                    bg-gradient-to-r
+                    ${color.progress}
+                  `}
+                  style={{
+                    width:
+                      `${Math.min(
+                        service.data?.progress || 0,
+                        100
+                      )}%`
+                  }}
+                />
+
+              </div>
+
+              <div
+                className="
+                  flex
+                  justify-between
+                  text-xs
+                  text-white/50
+                  mt-2
+                "
+              >
+
+                <span>
+                  Progress
+                </span>
+
+                <span>
+                  {Math.round(
+                    service.data?.progress || 0
+                  )}%
+                </span>
+
+              </div>
+
+            </div>
+
+          );
+
+        })}
+
+      </div>
+
+      {/* RECOMMENDATION */}
+
+      <div
+        className="
+          rounded-2xl
+          border border-blue-500/20
+          bg-blue-500/10
+          p-5
+        "
+      >
+
+        <div
+          className="
+            flex items-center gap-2
+            text-blue-300
+            font-bold
+            mb-2
+          "
+        >
+
+          <ShieldCheck size={18} />
+
+          Recommendation
+
+        </div>
+
+        <div
+          className="
+            text-sm
+            text-white/80
+          "
+        >
+
+          {oil?.remainingKm > 2000
+            ? "น้ำมันเครื่องยังอยู่ในเกณฑ์ดี ยังไม่จำเป็นต้องเข้ารับบริการ"
+            : "แนะนำวางแผนเข้ารับบริการเปลี่ยนน้ำมันเครื่องเร็ว ๆ นี้"}
+
+        </div>
+
+      </div>
+
+      {/* ALERT */}
+
+      {oil?.isOverdue && (
+
+        <div
+          className="
+            rounded-2xl
+            border border-red-500/20
+            bg-red-500/10
+            p-4
+          "
+        >
+
+          <div
+            className="
+              flex items-center gap-2
+              text-red-300
+              font-bold
+            "
+          >
+
+            <AlertTriangle size={18} />
+
+            Maintenance Overdue
+
+          </div>
+
+          <div
+            className="
+              text-sm
+              text-white/80
+              mt-1
+            "
+          >
+
+            น้ำมันเครื่องเลยกำหนดแล้ว กรุณาเข้ารับบริการโดยเร็ว
+
+          </div>
 
         </div>
 
       )}
-
-      {/* GRID */}
-
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-5">
-
-        <ServiceCard
-
-          title="น้ำมันเครื่อง"
-
-          icon="🛢️"
-
-          service={oilService}
-
-          status={oilStatus}
-
-          color="bg-orange-500"
-
-        />
-
-        <ServiceCard
-
-          title="ไส้กรองอากาศ"
-
-          icon="🌬️"
-
-          service={airService}
-
-          status={airStatus}
-
-          color="bg-cyan-500"
-
-        />
-
-        <ServiceCard
-
-          title="ยางรถ"
-
-          icon="🛞"
-
-          service={tireService}
-
-          status={tireStatus}
-
-          color="bg-purple-500"
-
-        />
-
-      </div>
 
     </div>
 

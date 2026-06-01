@@ -374,9 +374,7 @@ const maintenanceAnalytics =
             setServiceHistory={setServiceHistory}
             user={user}
             expenses={expenses}
-            maintenanceAnalytics={
-              maintenanceAnalytics
-            }
+            maintenanceAnalytics={maintenanceAnalytics}
           />
 
         </div>

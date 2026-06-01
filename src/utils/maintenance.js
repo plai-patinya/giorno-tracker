@@ -154,3 +154,135 @@ export const estimateDaysLeft = (
   );
 
 };
+
+//
+// 🚗 GET CURRENT ODOMETER
+//
+
+export const getCurrentOdometer = (
+  fuelRecords = []
+) => {
+
+  if (!fuelRecords.length) {
+    return 0;
+  }
+
+  return Math.max(
+    ...fuelRecords.map(
+      record =>
+        Number(
+          record.odometer || 0
+        )
+    )
+  );
+
+};
+
+//
+// 🛠️ GET LATEST SERVICE
+//
+
+export const getLatestServiceByCategory = (
+  maintenanceRecords = [],
+  category
+) => {
+
+  return maintenanceRecords
+
+    .filter(
+      item =>
+        item.category === category
+    )
+
+    .sort(
+      (a, b) =>
+        Number(
+          b.serviceOdometer || 0
+        ) -
+        Number(
+          a.serviceOdometer || 0
+        )
+    )[0];
+
+};
+
+//
+// 🤖 REAL MAINTENANCE ANALYTICS
+//
+
+export const buildMaintenanceAnalytics = (
+
+  fuelRecords = [],
+
+  maintenanceRecords = [],
+
+  category
+
+) => {
+
+  const currentOdo =
+    getCurrentOdometer(
+      fuelRecords
+    );
+
+  const latestService =
+    getLatestServiceByCategory(
+      maintenanceRecords,
+      category
+    );
+
+  if (!latestService) {
+
+    return null;
+
+  }
+
+  const service =
+    calculateService(
+
+      currentOdo,
+
+      Number(
+        latestService
+          .serviceOdometer
+      ),
+
+      Number(
+        latestService
+          .nextServiceKm
+      )
+
+    );
+
+  return {
+
+    currentOdo,
+
+    latestService,
+
+    ...service,
+
+    statusStyle:
+      getServiceStatus(
+        service.progress
+      ),
+
+    recommendation:
+      getRecommendation(
+
+        service.progress,
+
+        latestService.title
+
+      ),
+
+    daysLeft:
+      estimateDaysLeft(
+
+        service.remainingKm
+
+      )
+
+  };
+
+};

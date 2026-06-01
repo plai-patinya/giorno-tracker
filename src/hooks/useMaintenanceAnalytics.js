@@ -38,7 +38,7 @@ const useMaintenanceAnalytics =
 
       maintenanceRecords,
 
-      "oil"
+      "Engine Oil"
     );
 
   //
@@ -50,7 +50,7 @@ const useMaintenanceAnalytics =
 
       maintenanceRecords,
 
-      "tires"
+      "Tires"
     );
 
   //
@@ -62,7 +62,7 @@ const useMaintenanceAnalytics =
 
       maintenanceRecords,
 
-      "brakes"
+      "Brake Pads"
     );
 
   //
@@ -74,7 +74,7 @@ const useMaintenanceAnalytics =
 
       maintenanceRecords,
 
-      "battery"
+      "Battery"
     );
 
   //
@@ -89,9 +89,10 @@ const useMaintenanceAnalytics =
         currentOdo,
 
         lastServiceOdo:
-          oilService?.odometer || 0,
+          oilService?.serviceOdometer || 0,
 
-        intervalKm: 3000
+        intervalKm:
+          oilService?.nextServiceKm || 3000
 
       });
 
@@ -101,9 +102,10 @@ const useMaintenanceAnalytics =
         currentOdo,
 
         lastServiceOdo:
-          tireService?.odometer || 0,
+          tireService?.serviceOdometer || 0,
 
-        intervalKm: 20000
+        intervalKm:
+          tireService?.nextServiceKm || 20000
 
       });
 
@@ -113,9 +115,10 @@ const useMaintenanceAnalytics =
         currentOdo,
 
         lastServiceOdo:
-          brakeService?.odometer || 0,
+          brakeService?.serviceOdometer || 0,
 
-        intervalKm: 12000
+        intervalKm:
+          brakeService?.nextServiceKm || 12000
 
       });
 
@@ -125,9 +128,10 @@ const useMaintenanceAnalytics =
         currentOdo,
 
         lastServiceOdo:
-          batteryService?.odometer || 0,
+          batteryService?.serviceOdometer || 0,
 
-        intervalKm: 18000
+        intervalKm:
+          batteryService?.nextServiceKm || 18000
 
       });
 

@@ -56,7 +56,7 @@ import {
     uid,
     expenses,
     fuelRecords,
-    serviceHistory
+    maintenanceRecords
   ) => {
 
     await setDoc(
@@ -66,7 +66,7 @@ import {
       {
         expenses,
         fuelRecords,
-        serviceHistory
+        maintenanceRecords
       },
 
       {
@@ -112,7 +112,7 @@ export const subscribeUserData = (
   uid,
   setExpenses,
   setFuelRecords,
-  setServiceHistory,
+  setMaintenanceRecords,
   setCloudLoaded
 ) => {
 
@@ -133,11 +133,9 @@ export const subscribeUserData = (
           return [];
         };
         setExpenses(safeArray(data?.expenses));
+        setFuelRecords(safeArray(data?.fuelRecords));
 
-        setFuelRecords(
-          safeArray(data?.fuelRecords)
-        );
-        setServiceHistory(safeArray(data?.serviceHistory));
+        setMaintenanceRecords(safeArray(data?.maintenanceRecords));
         setCloudLoaded(true);
       } else {
 

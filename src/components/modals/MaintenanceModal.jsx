@@ -106,7 +106,7 @@ const MaintenanceModal = ({
         .toISOString()
         .split("T")[0],
 
-    odometer:
+    serviceOdometer:
       currentOdo
 
   });
@@ -153,34 +153,33 @@ const MaintenanceModal = ({
 
   const handleSave = () => {
 
+    const serviceOdometer =
+      Number(form.serviceOdometer);
+
+    const nextServiceKm =
+      Number(form.nextServiceKm);
+
     const record = {
 
       ...form,
 
-      odometer:
-        Number(
-          form.odometer
-        ),
+      serviceOdometer,
+
+      nextServiceKm,
+
+      nextDueOdo:
+        serviceOdometer +
+        nextServiceKm,
 
       laborCost:
-        Number(
-          form.laborCost
-        ),
+        Number(form.laborCost),
 
       partsCost:
-        Number(
-          form.partsCost
-        ),
+        Number(form.partsCost),
 
       totalCost:
-
-        Number(
-          form.laborCost
-        ) +
-
-        Number(
-          form.partsCost
-        )
+        Number(form.laborCost) +
+        Number(form.partsCost)
 
     };
 
@@ -202,6 +201,8 @@ const MaintenanceModal = ({
 
         z-[9999]
 
+        overflow-y-auto
+
         flex items-center justify-center
 
         bg-black/60
@@ -220,6 +221,8 @@ const MaintenanceModal = ({
 
           w-full max-w-2xl
 
+          max-h-[90vh]
+
           rounded-3xl
 
           border border-white/10
@@ -230,7 +233,7 @@ const MaintenanceModal = ({
 
           shadow-[0_0_80px_rgba(168,85,247,0.25)]
 
-          overflow-hidden
+          overflow-y-auto
 
           animate-[fadeInUp_0.35s_ease]
 
@@ -332,7 +335,7 @@ const MaintenanceModal = ({
 
         <div className="p-6 space-y-5">
 
-          {/* DATE + ODOMETER */}
+          {/* DATE + serviceOdometer */}
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
 
@@ -366,21 +369,65 @@ const MaintenanceModal = ({
 
                 <GaugeCircle size={14} />
 
-                ระยะทาง (km)
+                เลขไมล์ตอนเข้ารับบริการ
 
               </label>
 
               <input
                 type="number"
-                value={form.odometer}
+                value={form.serviceOdometer}
                 onChange={(e) =>
                   handleChange(
-                    "odometer",
+                    "serviceOdometer",
                     e.target.value
                   )
                 }
                 className={inputStyle}
               />
+
+            </div>
+
+            <div>
+
+              <label
+                className="
+                  text-sm
+                  text-white/60
+                  flex items-center gap-2
+                "
+              >
+
+                <GaugeCircle size={14} />
+
+                ระยะเปลี่ยนครั้งถัดไป (km)
+
+              </label>
+
+              <input
+
+                type="number"
+
+                value={form.nextServiceKm}
+
+                onChange={(e) =>
+                  handleChange(
+                    "nextServiceKm",
+                    e.target.value
+                  )
+                }
+
+                className={inputStyle}
+
+                placeholder="เช่น 5000"
+
+              />
+
+              <p className="mt-1 text-xs text-white/40">
+
+                ตัวอย่าง:
+                เปลี่ยนน้ำมันเครื่องทุก 5,000 km
+
+              </p>
 
             </div>
 
@@ -636,10 +683,9 @@ const MaintenanceModal = ({
 
             disabled={
               !form.title ||
-
               !form.category ||
-
-              !form.odometer
+              !form.serviceOdometer ||
+              !form.nextServiceKm
             }
 
             className="

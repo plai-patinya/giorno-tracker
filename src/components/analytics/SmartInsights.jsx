@@ -20,7 +20,6 @@ const SmartInsights = ({
   categoryChartData = [],
   monthlyChartData = [],
   fuelRecords = [],
-  serviceHistory = [],
   expenses = []
 
 }) => {
@@ -170,8 +169,7 @@ const SmartInsights = ({
       tireProgress:
         tireService.progress,
 
-      serviceCount:
-        serviceHistory.length
+      serviceCount: 0
 
     });
 

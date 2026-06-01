@@ -10,9 +10,8 @@ const AnalyticsCharts = ({
   categoryTotals,
   monthlyData,
   fuelRecords = [],
-  serviceHistory = [],
-  setServiceHistory,
-  expenses = []
+  expenses = [],
+  maintenanceAnalytics
 }) => {
 
   //
@@ -179,14 +178,11 @@ const AnalyticsCharts = ({
         categoryChartData={categoryChartData}
         monthlyChartData={monthlyChartData}
         fuelRecords={fuelRecords}
-        serviceHistory={serviceHistory}
         expenses={expenses}
       />
 
       <MaintenancePanel
-        fuelRecords={fuelRecords}
-        serviceHistory={serviceHistory}
-        setServiceHistory={setServiceHistory}
+        maintenanceAnalytics={maintenanceAnalytics}
       />
 
       <ExpensePieChart

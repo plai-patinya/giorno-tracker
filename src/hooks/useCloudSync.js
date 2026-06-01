@@ -8,14 +8,12 @@ import {
 const useCloudSync = ({
   user,
   loading,
-
   expenses,
   fuelRecords,
-  serviceHistory,
-
+  maintenanceRecords,
   setExpenses,
   setFuelRecords,
-  setServiceHistory
+  setMaintenanceRecords
 
 }) => {
 
@@ -32,7 +30,7 @@ const useCloudSync = ({
       user.uid,
       setExpenses,
       setFuelRecords,
-      setServiceHistory,
+      setMaintenanceRecords,
       setCloudLoaded
     );
 
@@ -56,10 +54,10 @@ const useCloudSync = ({
     if (
       Array.isArray(expenses) &&
       Array.isArray(fuelRecords) &&
-      Array.isArray(serviceHistory) &&
+      Array.isArray(maintenanceRecords) &&
       expenses.length === 0 &&
       fuelRecords.length === 0 &&
-      serviceHistory.length === 0
+      maintenanceRecords.length === 0
     ) {
       console.log("⛔ skip save (empty)");
       return;
@@ -71,7 +69,7 @@ const useCloudSync = ({
     if (
       !Array.isArray(expenses) ||
       !Array.isArray(fuelRecords) ||
-      !Array.isArray(serviceHistory)
+      !Array.isArray(maintenanceRecords)
     ) {
       console.warn("❌ Invalid data type - skip sync");
       return;
@@ -80,20 +78,20 @@ const useCloudSync = ({
     // ✅ sanitize กัน function / proxy
     const safeExpenses = JSON.parse(JSON.stringify(expenses));
     const safeFuel = JSON.parse(JSON.stringify(fuelRecords));
-    const safeService = JSON.parse(JSON.stringify(serviceHistory));
+    const safeMaintenance =
+    JSON.parse(
+      JSON.stringify(
+        maintenanceRecords
+      )
+    );
 
     try {
 
     await saveUserData(
-
       user.uid,
-
       safeExpenses,
-
       safeFuel,
-
-      safeService
-
+      safeMaintenance
     );
 
     console.log(
@@ -118,7 +116,7 @@ const useCloudSync = ({
   }, [
     expenses,
     fuelRecords,
-    serviceHistory,
+    maintenanceRecords,
     user,
     loading,
     cloudLoaded
