@@ -1,6 +1,6 @@
 export const generateRecommendations = ({
 
-  maintenanceScore,
+  maintenanceAnalytics,
 
   averageKmPerLiter,
 
@@ -8,41 +8,196 @@ export const generateRecommendations = ({
 
   totalExpense,
 
-  oilService,
-
   drivingProfile
 
 }) => {
 
   const recommendations = [];
 
-  //
-  // 🛢️ OIL
-  //
+  const addServiceRecommendation = (
+    icon,
+    title,
+    service
+  ) => {
 
-  if (oilService.progress >= 75) {
+    //
+    // ไม่มีข้อมูล
+    //
+
+    if (!service) {
+
+      recommendations.push({
+
+        priority: "unknown",
+
+        icon,
+
+        title,
+
+        description:
+          "ยังไม่มีประวัติการบำรุงรักษา"
+
+      });
+
+      return;
+
+    }
+
+    if (
+      service.status ===
+      "unknown"
+    ) {
+
+      recommendations.push({
+
+        priority: "unknown",
+
+        icon,
+
+        title,
+
+        description:
+          "ยังไม่มีประวัติการบำรุงรักษา"
+
+      });
+
+      return;
+
+    }
+
+    //
+    // เลยกำหนด
+    //
+
+    if (service.isOverdue) {
+
+      recommendations.push({
+
+        priority: "high",
+
+        icon,
+
+        title,
+
+        description:
+          `เลยกำหนด ${Math.abs(
+            service.remainingKm
+          ).toLocaleString()} km`
+
+      });
+
+      return;
+
+    }
+
+    //
+    // ใกล้ถึงกำหนด
+    //
+
+    if (service.remainingKm <= 1000) {
+
+      recommendations.push({
+
+        priority: "medium",
+
+        icon,
+
+        title,
+
+        description:
+          `เหลืออีก ${service.remainingKm.toLocaleString()} km`
+
+      });
+
+      return;
+
+    }
+
+    //
+    // ปกติ
+    //
 
     recommendations.push({
 
-      priority: "high",
+      priority: "good",
 
-      icon: "🛢️",
+      icon,
 
-      title:
-        "ควรเปลี่ยนน้ำมันเครื่อง",
+      title,
 
       description:
-        `เหลืออีก ${oilService.remainingKm.toLocaleString()} km`
+        `ปกติ (เหลือ ${service.remainingKm.toLocaleString()} km)`
 
     });
 
-  }
+  };
 
   //
-  // ⛽ FUEL
+  // 🏍️ MAINTENANCE
   //
 
-  if (averageKmPerLiter < 30) {
+  addServiceRecommendation(
+    "🛢️",
+    "Engine Oil",
+    maintenanceAnalytics?.oil
+  );
+
+  addServiceRecommendation(
+    "🌬️",
+    "Air Filter",
+    maintenanceAnalytics?.airFilter
+  );
+
+  addServiceRecommendation(
+    "⚡",
+    "Spark Plug",
+    maintenanceAnalytics?.sparkPlug
+  );
+
+  addServiceRecommendation(
+    "⚙️",
+    "CVT Belt",
+    maintenanceAnalytics?.cvtBelt
+  );
+
+  addServiceRecommendation(
+    "🔩",
+    "Roller Weight",
+    maintenanceAnalytics?.roller
+  );
+
+  addServiceRecommendation(
+    "🧪",
+    "Brake Fluid",
+    maintenanceAnalytics?.brakeFluid
+  );
+
+  addServiceRecommendation(
+    "🛑",
+    "Brake Pads",
+    maintenanceAnalytics?.brakes
+  );
+
+  addServiceRecommendation(
+    "🔋",
+    "Battery",
+    maintenanceAnalytics?.battery
+  );
+
+  addServiceRecommendation(
+    "🛞",
+    "Tires",
+    maintenanceAnalytics?.tires
+  );
+
+  //
+  // ⛽ Fuel Economy
+  //
+
+  if (
+    averageKmPerLiter &&
+    averageKmPerLiter < 30
+  ) {
 
     recommendations.push({
 
@@ -51,20 +206,23 @@ export const generateRecommendations = ({
       icon: "⛽",
 
       title:
-        "อัตราสิ้นเปลืองสูง",
+        "Fuel Economy ต่ำ",
 
       description:
-        "ควรตรวจสอบกรองอากาศและแรงดันลมยาง"
+        "ควรตรวจสอบแรงดันลมยาง และไส้กรองอากาศ"
 
     });
 
   }
 
   //
-  // 📈 TREND
+  // 📈 Expense Trend
   //
 
-  if (monthlyTrend > 15) {
+  if (
+    monthlyTrend &&
+    monthlyTrend > 15
+  ) {
 
     recommendations.push({
 
@@ -76,36 +234,14 @@ export const generateRecommendations = ({
         "ค่าใช้จ่ายเพิ่มขึ้น",
 
       description:
-        "ควรควบคุมงบประมาณในเดือนถัดไป"
+        "ค่าใช้จ่ายเดือนนี้สูงกว่าปกติ"
 
     });
 
   }
 
   //
-  // 🚨 HEALTH
-  //
-
-  if (maintenanceScore < 70) {
-
-    recommendations.push({
-
-      priority: "high",
-
-      icon: "🚨",
-
-      title:
-        "Vehicle Health ต่ำ",
-
-      description:
-        "ควรเข้าตรวจเช็กสภาพรถ"
-
-    });
-
-  }
-
-  //
-  // 🔴 PERFORMANCE
+  // 🏁 Driving Style
   //
 
   if (
@@ -120,38 +256,100 @@ export const generateRecommendations = ({
       icon: "🏁",
 
       title:
-        "รถถูกใช้งานหนัก",
+        "ใช้งานรถหนัก",
 
       description:
-        "ควรตรวจสอบระบบช่วงล่างและเครื่องยนต์สม่ำเสมอ"
+        "ควรตรวจสอบระบบส่งกำลังและช่วงล่างสม่ำเสมอ"
 
     });
 
   }
 
   //
-  // 🟢 HEALTHY
+  // 💚 Vehicle Health
   //
 
   if (
-    recommendations.length === 0
+    maintenanceAnalytics?.maintenanceHealth >=
+    90
   ) {
 
     recommendations.push({
 
       priority: "good",
 
-      icon: "✅",
+      icon: "💚",
 
       title:
-        "สภาพรถยอดเยี่ยม",
+        "Vehicle Health ดีเยี่ยม",
 
       description:
-        "ยังไม่พบความเสี่ยงสำคัญ"
+        "ระบบบำรุงรักษาอยู่ในเกณฑ์ดี"
 
     });
 
   }
+
+  const coverage =
+    maintenanceAnalytics?.maintenanceCoverage ?? 0;
+
+  if (coverage < 30) {
+
+    recommendations.push({
+
+      priority: "medium",
+
+      icon: "📋",
+
+      title:
+        "Service Coverage ต่ำ",
+
+      description:
+        `มีข้อมูลการบำรุงรักษาเพียง ${coverage}%`
+
+    });
+
+  }
+  else if (coverage < 70) {
+
+    recommendations.push({
+
+      priority: "low",
+
+      icon: "📋",
+
+      title:
+        "Service Coverage ปานกลาง",
+
+      description:
+        `มีข้อมูลการบำรุงรักษา ${coverage}%`
+
+    });
+
+  }
+
+  //
+  // SORT PRIORITY
+  //
+
+  const priorityOrder = {
+
+    high: 1,
+    medium: 2,
+    low: 3,
+    good: 4,
+    unknown: 5
+
+  };
+
+  recommendations.sort(
+
+    (a, b) =>
+
+      priorityOrder[a.priority] -
+      priorityOrder[b.priority]
+
+  );
 
   return recommendations;
 

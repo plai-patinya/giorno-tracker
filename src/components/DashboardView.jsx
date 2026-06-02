@@ -45,145 +45,141 @@ from "../utils/recommendationEngine";
 import useMaintenanceAnalytics
 from "../hooks/useMaintenanceAnalytics";
 
-const animateCard = (delay = 0) =>
-  `opacity-0 animate-fadeUp [animation-delay:${delay}ms]`;
+  const animateCard = (delay = 0) =>
+    `opacity-0 animate-fadeUp [animation-delay:${delay}ms]`;
 
-const DashboardView = ({
-  stats,
-  BIKE_BASE_PRICE,
-  partsExpense,
-  monthlyData,
-  categoryTotals,
-  categories,
-  fuelRecords,
-  serviceHistory,
-  setServiceHistory,
-  user,
-  expenses
-}) => {
+  const DashboardView = ({
+    stats,
+    BIKE_BASE_PRICE,
+    partsExpense,
+    monthlyData,
+    categoryTotals,
+    categories,
+    fuelRecords,
+    serviceHistory,
+    setServiceHistory,
+    user,
+    expenses
+  }) => {
 
   const activities =
-  generateActivityFeed({
+    generateActivityFeed({
 
-    expenses:
-      stats?.expenses || [],
+      expenses:
+        stats?.expenses || [],
 
-    fuelRecords,
+      fuelRecords,
 
-    maintenanceScore:
-      stats?.vehicleHealth || 82,
+      maintenanceScore:
+        stats?.vehicleHealth || 82,
 
-    monthlyTrend:
-      stats?.monthlyTrend || 12,
+      monthlyTrend:
+        stats?.monthlyTrend || 12,
 
-    oilService: {
+      oilService: {
 
-      progress: 78,
+        progress: 78,
 
-      remainingKm: 420
+        remainingKm: 420
 
-    }
+      }
 
-  });
+    });
 
   const forecastData =
-  generateExpenseForecast(
+    generateExpenseForecast(
 
-    Object.entries(monthlyData || {}).map(
-      ([month, expenses]) => ({
+      Object.entries(monthlyData || {}).map(
+        ([month, expenses]) => ({
 
-        month,
+          month,
 
-        total:
-          expenses.reduce(
-            (sum, item) =>
-              sum + item.price,
-            0
-          )
-
-      })
-    )
-
-  );
-
-  const drivingProfile =
-  getDrivingProfile({
-
-    averageKmPerLiter:
-      stats?.avgFuelConsumption || 42,
-
-    totalExpense:
-      stats?.totalExpenseWithBike || 0,
-
-    expenseCount:
-      stats?.totalItems || 0,
-
-    avgPerDay:
-      stats?.avgPerDay || 0,
-
-    maintenanceScore:
-      stats?.vehicleHealth || 82
-
-  });
-
-  const recommendations =
-  generateRecommendations({
-
-    maintenanceScore:
-      stats?.vehicleHealth || 82,
-
-    averageKmPerLiter:
-      stats?.avgFuelConsumption || 42,
-
-    monthlyTrend:
-      stats?.monthlyTrend || 12,
-
-    totalExpense:
-      stats?.totalExpenseWithBike || 0,
-
-    oilService: {
-
-      progress: 78,
-
-      remainingKm: 420
-
-    },
-
-    drivingProfile
-
-  });
-
-  //
-// 🚗 CURRENT ODOMETER
-//
-
-const currentOdo =
-
-  fuelRecords.length > 0
-
-    ? Math.max(
-
-        ...fuelRecords.map(
-          (record) =>
-
-            Number(
-              record.odometer || 0
+          total:
+            expenses.reduce(
+              (sum, item) =>
+                sum + item.price,
+              0
             )
-        )
 
+        })
       )
 
-    : 0;
+    );
 
-//
-// 🛠️ MAINTENANCE ANALYTICS
-//
+  const drivingProfile =
+    getDrivingProfile({
 
-const maintenanceAnalytics =
+      averageKmPerLiter:
+        stats?.avgFuelConsumption || 42,
 
-  useMaintenanceAnalytics(
-    currentOdo
-  );
+      totalExpense:
+        stats?.totalExpenseWithBike || 0,
+
+      expenseCount:
+        stats?.totalItems || 0,
+
+      avgPerDay:
+        stats?.avgPerDay || 0,
+
+      maintenanceScore:
+        stats?.vehicleHealth || 82
+
+    });
+
+  //
+  // 🚗 CURRENT ODOMETER
+  //
+
+  const currentOdo =
+
+    fuelRecords.length > 0
+
+      ? Math.max(
+
+          ...fuelRecords.map(
+            (record) =>
+
+              Number(
+                record.odometer || 0
+              )
+          )
+
+        )
+
+      : 0;
+
+  //
+  // 🛠️ MAINTENANCE ANALYTICS
+  //
+
+  const maintenanceAnalytics =
+
+    useMaintenanceAnalytics(
+      currentOdo
+    );
+
+  const recommendations =
+    generateRecommendations({
+
+      maintenanceAnalytics,
+
+      averageKmPerLiter:
+        stats?.avgFuelConsumption || 42,
+
+      monthlyTrend:
+        stats?.monthlyTrend || 12,
+
+      totalExpense:
+        stats?.totalExpenseWithBike || 0,
+
+      drivingProfile
+
+    });
+
+    console.log(
+      "🤖 RECOMMENDATIONS:",
+      recommendations
+    );
 
   return (
     <div className="space-y-6 lg:space-y-8">

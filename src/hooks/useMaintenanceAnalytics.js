@@ -35,9 +35,7 @@ const useMaintenanceAnalytics =
 
   const oilService =
     getLatestService(
-
       maintenanceRecords,
-
       "Engine Oil"
     );
 
@@ -47,9 +45,7 @@ const useMaintenanceAnalytics =
 
   const tireService =
     getLatestService(
-
       maintenanceRecords,
-
       "Tires"
     );
 
@@ -77,6 +73,36 @@ const useMaintenanceAnalytics =
       "Battery"
     );
 
+  const airFilterService =
+  getLatestService(
+    maintenanceRecords,
+    "Air Filter"
+  );
+
+  const sparkPlugService =
+    getLatestService(
+      maintenanceRecords,
+      "Spark Plug"
+    );
+
+  const cvtBeltService =
+    getLatestService(
+      maintenanceRecords,
+      "CVT Belt"
+    );
+
+  const rollerService =
+    getLatestService(
+      maintenanceRecords,
+      "Roller Weight"
+    );
+
+  const brakeFluidService =
+    getLatestService(
+      maintenanceRecords,
+      "Brake Fluid"
+    );  
+
   //
   // 📊 ANALYTICS
   //
@@ -89,7 +115,7 @@ const useMaintenanceAnalytics =
         currentOdo,
 
         lastServiceOdo:
-          oilService?.serviceOdometer || 0,
+          oilService?.serviceOdometer,
 
         intervalKm:
           oilService?.nextServiceKm || 3000
@@ -102,10 +128,75 @@ const useMaintenanceAnalytics =
         currentOdo,
 
         lastServiceOdo:
-          tireService?.serviceOdometer || 0,
+          tireService?.serviceOdometer,
 
         intervalKm:
           tireService?.nextServiceKm || 20000
+
+      });
+
+    const airFilter =
+      calculateServiceStatus({
+
+        currentOdo,
+
+        lastServiceOdo:
+          airFilterService?.serviceOdometer,
+
+        intervalKm:
+          airFilterService?.nextServiceKm || 4000
+
+      });
+
+    const sparkPlug =
+      calculateServiceStatus({
+
+        currentOdo,
+
+        lastServiceOdo:
+          sparkPlugService?.serviceOdometer,
+
+        intervalKm:
+          sparkPlugService?.nextServiceKm || 8000
+
+      });
+
+    const cvtBelt =
+      calculateServiceStatus({
+
+        currentOdo,
+
+        lastServiceOdo:
+          cvtBeltService?.serviceOdometer,
+
+        intervalKm:
+          cvtBeltService?.nextServiceKm || 24000
+
+      });
+
+    const roller =
+      calculateServiceStatus({
+
+        currentOdo,
+
+        lastServiceOdo:
+          rollerService?.serviceOdometer,
+
+        intervalKm:
+          rollerService?.nextServiceKm || 24000
+
+      });
+
+    const brakeFluid =
+      calculateServiceStatus({
+
+        currentOdo,
+
+        lastServiceOdo:
+          brakeFluidService?.serviceOdometer,
+
+        intervalKm:
+          brakeFluidService?.nextServiceKm || 24000
 
       });
 
@@ -115,7 +206,7 @@ const useMaintenanceAnalytics =
         currentOdo,
 
         lastServiceOdo:
-          brakeService?.serviceOdometer || 0,
+          brakeService?.serviceOdometer,
 
         intervalKm:
           brakeService?.nextServiceKm || 12000
@@ -128,37 +219,115 @@ const useMaintenanceAnalytics =
         currentOdo,
 
         lastServiceOdo:
-          batteryService?.serviceOdometer || 0,
+          batteryService?.serviceOdometer,
 
         intervalKm:
           batteryService?.nextServiceKm || 18000
 
       });
 
+    const allServices = [
+
+      oil,
+      airFilter,
+      sparkPlug,
+      cvtBelt,
+      roller,
+      brakeFluid,
+      tires,
+      brakes,
+      battery
+
+    ];
+
+    const knownServices =
+
+      allServices.filter(
+        service =>
+          service.status !==
+          "unknown"
+      );
+
+    const maintenanceCoverage =
+
+      Math.round(
+
+        (
+          knownServices.length /
+          allServices.length
+        ) * 100
+
+      );
+
     //
     // 🚗 HEALTH
     //
 
     const maintenanceHealth =
-      calculateMaintenanceHealth({
+      calculateMaintenanceHealth([
 
-        oilStatus:
-          oil.status,
+        oil.status,
 
-        tireStatus:
-          tires.status,
+        airFilter.status,
 
-        brakeStatus:
-          brakes.status,
+        sparkPlug.status,
 
-        batteryStatus:
-          battery.status
+        cvtBelt.status,
 
-      });
+        roller.status,
+
+        tires.status,
+
+        brakes.status,
+
+        battery.status,
+
+        brakeFluid.status
+
+      ]);
+
+      console.log(
+        "📊 ANALYTICS V3:",
+        {
+
+          oil,
+
+          airFilter,
+
+          sparkPlug,
+
+          cvtBelt,
+
+          roller,
+
+          brakeFluid,
+
+          tires,
+
+          brakes,
+
+          battery,
+
+          maintenanceHealth,
+
+          maintenanceCoverage
+
+        }
+      );
 
     return {
 
       oil,
+
+      airFilter,
+
+      sparkPlug,
+
+      cvtBelt,
+
+      roller,
+
+      brakeFluid,
 
       tires,
 
@@ -168,9 +337,36 @@ const useMaintenanceAnalytics =
 
       maintenanceHealth,
 
+      maintenanceCoverage,
+
       oilStyle:
         getServiceStatusStyle(
           oil.status
+        ),
+
+      airFilterStyle:
+        getServiceStatusStyle(
+          airFilter.status
+        ),
+
+      sparkPlugStyle:
+        getServiceStatusStyle(
+          sparkPlug.status
+        ),
+
+      cvtBeltStyle:
+        getServiceStatusStyle(
+          cvtBelt.status
+        ),
+
+      rollerStyle:
+        getServiceStatusStyle(
+          roller.status
+        ),
+
+      brakeFluidStyle:
+        getServiceStatusStyle(
+          brakeFluid.status
         ),
 
       tireStyle:

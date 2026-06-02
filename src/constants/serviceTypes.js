@@ -4,6 +4,20 @@ export const SERVICE_TYPES = {
 
   AIR_FILTER: "airFilter",
 
-  TIRES: "tires"
+  TIRES: "tires",
+
+  BRAKES: "brakes",
+
+  BATTERY: "battery",
+
+  CHAIN: "chain",
+
+  COOLANT: "coolant",
+
+  SPARK_PLUG: "sparkPlug",
+
+  CVT_BELT: "cvtBelt",
+
+  ROLLER: "roller"
 
 };

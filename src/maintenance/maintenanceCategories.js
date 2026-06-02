@@ -2,23 +2,27 @@ export const MAINTENANCE_CATEGORIES = [
 
   "Engine Oil",
 
-  "Brake System",
+  "Air Filter",
+
+  "Spark Plug",
+
+  "CVT Belt",
+
+  "Roller Weight",
+
+  "Brake Pads",
+
+  "Brake Fluid",
 
   "Tires",
 
-  "Suspension",
+  "Battery",
 
   "Cooling System",
 
+  "Suspension",
+
   "Electrical",
-
-  "Transmission",
-
-  "Chain & Sprocket",
-
-  "Air Filter",
-
-  "Battery",
 
   "General Service",
 

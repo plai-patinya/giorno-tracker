@@ -39,6 +39,11 @@ import {
 import useMaintenanceCRUD
 from "../../hooks/useMaintenanceCRUD";
 
+import {
+  SERVICE_INTERVALS
+}
+from "../../maintenance/serviceIntervals";
+
 const inputStyle = `
 
   w-full
@@ -126,6 +131,33 @@ const MaintenanceModal = ({
     key,
     value
   ) => {
+
+    //
+    // Auto Interval
+    //
+
+    if (key === "category") {
+
+      const interval =
+
+        SERVICE_INTERVALS[value];
+
+      setForm((prev) => ({
+
+        ...prev,
+
+        category: value,
+
+        nextServiceKm:
+
+          interval ||
+          prev.nextServiceKm
+
+      }));
+
+      return;
+
+    }
 
     setForm((prev) => ({
 
@@ -424,8 +456,7 @@ const MaintenanceModal = ({
 
               <p className="mt-1 text-xs text-white/40">
 
-                ตัวอย่าง:
-                เปลี่ยนน้ำมันเครื่องทุก 5,000 km
+                ค่าที่ระบบเติมมาอ้างอิงจากมาตรฐาน
 
               </p>
 

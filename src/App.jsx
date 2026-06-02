@@ -1069,9 +1069,7 @@ const ExpenseTracker = () => {
             serviceHistory={maintenanceRecords}
             setServiceHistory={setMaintenanceRecords}
             user={user}
-            saveServiceHistoryWithSync={
-              saveServiceHistoryWithSync
-            }
+            saveServiceHistoryWithSync={saveServiceHistoryWithSync}
           />
         )}
 

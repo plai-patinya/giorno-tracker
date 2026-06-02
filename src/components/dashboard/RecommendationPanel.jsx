@@ -53,6 +53,36 @@ const RecommendationPanel = ({
 
         };
 
+      case "unknown":
+
+        return {
+
+          border:
+            "border-white/10",
+
+          bg:
+            "from-white/5 to-white/0",
+
+          text:
+            "text-white/50"
+
+        };
+
+      case "low":
+
+        return {
+
+          border:
+            "border-cyan-500/20",
+
+          bg:
+            "from-cyan-500/15 to-blue-500/10",
+
+          text:
+            "text-cyan-300"
+
+        };
+
       default:
 
         return {

@@ -38,11 +38,36 @@ export const calculateServiceStatus = ({
 
   currentOdo = 0,
 
-  lastServiceOdo = 0,
+  lastServiceOdo = null,
 
   intervalKm = 3000
 
 }) => {
+
+  //
+  // ⚪ NO RECORD
+  //
+
+  if (
+    lastServiceOdo === null ||
+    lastServiceOdo === undefined
+  ) {
+
+    return {
+
+      usedKm: 0,
+
+      remainingKm: null,
+
+      progress: 0,
+
+      isOverdue: false,
+
+      status: "unknown"
+
+    };
+
+  }
 
   const usedKm =
 
@@ -71,16 +96,8 @@ export const calculateServiceStatus = ({
 
     );
 
-  //
-  // 🚨 OVERDUE
-  //
-
   const isOverdue =
     remainingKm <= 0;
-
-  //
-  // 🚨 STATUS
-  //
 
   let status =
     "healthy";
@@ -159,6 +176,24 @@ export const getServiceStatusStyle =
           "Warning"
 
       };
+    
+    case "unknown":
+
+      return {
+
+        color:
+          "text-slate-400",
+
+        bg:
+          "bg-slate-500/10",
+
+        border:
+          "border-slate-500/20",
+
+        label:
+          "Unknown"
+
+      };
 
     default:
 
@@ -187,47 +222,37 @@ export const getServiceStatusStyle =
 //
 
 export const calculateMaintenanceHealth =
-({
-
-  oilStatus,
-
-  tireStatus,
-
-  brakeStatus,
-
-  batteryStatus
-
-}) => {
+(statuses = []) => {
 
   const statusMap = {
 
     healthy: 100,
-
     warning: 70,
-
     critical: 40
 
   };
 
-  const scores = [
+  if (!statuses.length) {
+    return 100;
+  }
 
-    statusMap[
-      oilStatus
-    ] || 100,
+  const validStatuses =
 
-    statusMap[
-      tireStatus
-    ] || 100,
+    statuses.filter(
+      status =>
+        status !== "unknown"
+    );
 
-    statusMap[
-      brakeStatus
-    ] || 100,
+  if (!validStatuses.length) {
+    return 100;
+  }
 
-    statusMap[
-      batteryStatus
-    ] || 100
+  const scores =
 
-  ];
+    validStatuses.map(
+      status =>
+        statusMap[status] || 100
+    );
 
   const avg =
 
