@@ -108,6 +108,13 @@ const NotificationCenter = ({
                       bg-yellow-500/10
                     `
 
+                    : item.level === "info"
+
+                    ? `
+                      border-blue-500/30
+                      bg-blue-500/10
+                    `
+
                     : `
                       border-cyan-500/30
                       bg-cyan-500/10

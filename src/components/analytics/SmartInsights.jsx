@@ -20,7 +20,9 @@ const SmartInsights = ({
   categoryChartData = [],
   monthlyChartData = [],
   fuelRecords = [],
-  expenses = []
+  expenses = [],
+
+  maintenanceAnalytics
 
 }) => {
 
@@ -131,47 +133,11 @@ const SmartInsights = ({
 
       : "เริ่มกินน้ำมัน";
 
-  //
-  // 🧠 MOCK MAINTENANCE
-  //
-
-  const oilService = {
-    progress: 35
-  };
-
-  const airService = {
-    progress: 52
-  };
-
-  const tireService = {
-    progress: 61
-  };
-
-  //
-  // 🚗 AI VEHICLE SCORE
-  //
-
+  
   const maintenanceScore =
-    calculateVehicleHealth({
 
-      fuelAverage:
-        averageKmPerLiter,
-
-      totalExpense:
-        total,
-
-      oilProgress:
-        oilService.progress,
-
-      airProgress:
-        airService.progress,
-
-      tireProgress:
-        tireService.progress,
-
-      serviceCount: 0
-
-    });
+  maintenanceAnalytics
+    ?.maintenanceHealth || 0;
 
   //
   // 🎨 HEALTH COLOR
@@ -253,24 +219,23 @@ const SmartInsights = ({
   // 🔔 NOTIFICATIONS
   //
 
-    const notifications =
-    generateNotifications({
+  const notifications =
+  generateNotifications({
 
-        maintenanceScore,
+      maintenanceAnalytics,
 
-        monthlyTrend,
+      monthlyTrend,
 
-        trendUp,
+      trendUp,
 
-        oilService,
+      averageKmPerLiter
 
-        airService,
+  });
 
-        tireService,
-
-        averageKmPerLiter
-
-    });
+  console.log(
+    "🔔 NOTIFICATIONS:",
+    notifications
+  );
 
   return (
 

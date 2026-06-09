@@ -1,43 +1,223 @@
 export const generateNotifications = ({
 
-  maintenanceScore,
+  maintenanceAnalytics,
+
+  averageKmPerLiter,
+
   monthlyTrend,
-  trendUp,
 
-  oilService,
-  airService,
-  tireService,
-
-  averageKmPerLiter
+  trendUp
 
 }) => {
 
   const notifications = [];
 
+  let unknownCount = 0;
+
+  const addServiceNotification = (
+    icon,
+    title,
+    service
+  ) => {
+
+    //
+    // ไม่มีข้อมูล
+    //
+
+  if (
+    !service ||
+    service.status === "unknown"
+  ) {
+
+    unknownCount++;
+
+    if (unknownCount <= 3) {
+
+      notifications.push({
+
+        level: "info",
+
+        icon,
+
+        title,
+
+        description:
+          "ยังไม่มีประวัติการบำรุงรักษา"
+
+      });
+
+    }
+
+    return;
+
+  }
+
+    //
+    // เลยกำหนด
+    //
+
+    if (service.isOverdue) {
+
+      notifications.push({
+
+        level: "critical",
+
+        icon,
+
+        title,
+
+        description:
+          `เลยกำหนด ${Math.abs(
+            service.remainingKm
+          ).toLocaleString()} km`
+
+      });
+
+      return;
+
+    }
+
+    //
+    // ใกล้ถึงกำหนด
+    //
+
+    if (service.remainingKm <= 1000) {
+
+      notifications.push({
+
+        level: "warning",
+
+        icon,
+
+        title,
+
+        description:
+          `เหลืออีก ${service.remainingKm.toLocaleString()} km`
+
+      });
+
+    }
+
+  };
+
   //
-  // 🚨 HEALTH
+  // 🛠️ Maintenance
   //
 
-  if (maintenanceScore < 70) {
+  addServiceNotification(
+    "🛢️",
+    "Engine Oil",
+    maintenanceAnalytics?.oil
+  );
+
+  addServiceNotification(
+    "🌬️",
+    "Air Filter",
+    maintenanceAnalytics?.airFilter
+  );
+
+  addServiceNotification(
+    "⚡",
+    "Spark Plug",
+    maintenanceAnalytics?.sparkPlug
+  );
+
+  addServiceNotification(
+    "⚙️",
+    "CVT Belt",
+    maintenanceAnalytics?.cvtBelt
+  );
+
+  addServiceNotification(
+    "🔩",
+    "Roller Weight",
+    maintenanceAnalytics?.roller
+  );
+
+  addServiceNotification(
+    "🧪",
+    "Brake Fluid",
+    maintenanceAnalytics?.brakeFluid
+  );
+
+  addServiceNotification(
+    "🛑",
+    "Brake Pads",
+    maintenanceAnalytics?.brakes
+  );
+
+  addServiceNotification(
+    "🔋",
+    "Battery",
+    maintenanceAnalytics?.battery
+  );
+
+  addServiceNotification(
+    "🛞",
+    "Tires",
+    maintenanceAnalytics?.tires
+  );
+
+  //
+  // 📋 Coverage
+  //
+
+  const coverage =
+    maintenanceAnalytics?.maintenanceCoverage;
+
+  if (
+
+    coverage !== null &&
+
+    coverage !== undefined &&
+
+    coverage < 30
+
+  ) {
 
     notifications.push({
 
-      level: "critical",
+      level: "warning",
 
-      icon: "🚨",
+      icon: "📋",
 
       title:
-        "Vehicle Health ต่ำ",
+        "Service Coverage ต่ำ",
 
       description:
-        "ควรตรวจเช็กรถโดยด่วน"
+        `มีข้อมูลการบำรุงรักษาเพียง ${coverage}%`
 
     });
 
   }
 
   //
-  // 📈 EXPENSE
+  // 💚 Vehicle Health
+  //
+
+  if (
+    maintenanceAnalytics?.maintenanceHealth >=
+    90
+  ) {
+
+    notifications.push({
+
+      level: "info",
+
+      icon: "💚",
+
+      title:
+        "Vehicle Health ดีเยี่ยม",
+
+      description:
+        "ระบบบำรุงรักษาอยู่ในเกณฑ์ดี"
+
+    });
+
+  }
+
+  //
+  // 📈 Expense Trend
   //
 
   if (trendUp) {
@@ -59,77 +239,12 @@ export const generateNotifications = ({
   }
 
   //
-  // 🛢️ OIL
-  //
-
-  if (oilService.progress >= 85) {
-
-    notifications.push({
-
-      level: "critical",
-
-      icon: "🛢️",
-
-      title:
-        "ใกล้ถึงรอบเปลี่ยนน้ำมันเครื่อง",
-
-      description:
-        `เหลืออีก ${oilService.remainingKm.toLocaleString()} km`
-
-    });
-
-  }
-
-  //
-  // 🌬️ AIR FILTER
-  //
-
-  if (airService.progress >= 75) {
-
-    notifications.push({
-
-      level: "warning",
-
-      icon: "🌬️",
-
-      title:
-        "ควรตรวจไส้กรองอากาศ",
-
-      description:
-        `เหลืออีก ${airService.remainingKm.toLocaleString()} km`
-
-    });
-
-  }
-
-  //
-  // 🛞 TIRES
-  //
-
-  if (tireService.progress >= 70) {
-
-    notifications.push({
-
-      level: "warning",
-
-      icon: "🛞",
-
-      title:
-        "อายุยางใกล้ครบระยะ",
-
-      description:
-        `เหลืออีก ${tireService.remainingKm.toLocaleString()} km`
-
-    });
-
-  }
-
-  //
-  // ⛽ FUEL
+  // ⛽ Fuel Economy
   //
 
   if (
-    Number(averageKmPerLiter) < 30
+    averageKmPerLiter &&
+    averageKmPerLiter < 30
   ) {
 
     notifications.push({
@@ -143,6 +258,41 @@ export const generateNotifications = ({
 
       description:
         "รถเริ่มกินน้ำมันมากขึ้น"
+
+    });
+
+  }
+
+  const priorityOrder = {
+
+    critical: 1,
+    warning: 2,
+    info: 3
+
+  };
+
+  notifications.sort(
+
+    (a, b) =>
+
+      priorityOrder[a.level] -
+      priorityOrder[b.level]
+
+  );
+
+  if (unknownCount > 3) {
+
+    notifications.push({
+
+      level: "info",
+
+      icon: "📋",
+
+      title:
+        "ยังไม่มีประวัติการบำรุงรักษาเพิ่มเติม",
+
+      description:
+        `อีก ${unknownCount - 3} รายการ`
 
     });
 

@@ -179,6 +179,7 @@ const AnalyticsCharts = ({
         monthlyChartData={monthlyChartData}
         fuelRecords={fuelRecords}
         expenses={expenses}
+        maintenanceAnalytics={maintenanceAnalytics}
       />
 
       <MaintenancePanel

@@ -45,9 +45,19 @@ const useMaintenancePersistence =
 
             await loadMaintenanceRecords();
 
-          setMaintenanceRecords(
-            records
-          );
+          if (
+
+            Array.isArray(records) &&
+
+            records.length > 0
+
+          ) {
+
+            setMaintenanceRecords(
+              records
+            );
+
+          }
 
         } catch (error) {
 
@@ -73,15 +83,26 @@ const useMaintenancePersistence =
 
   useEffect(() => {
 
+    //
+    // 🚫 DON'T SAVE EMPTY
+    //
+
+    if (
+      !maintenanceRecords ||
+      maintenanceRecords.length === 0
+    ) {
+
+      return;
+
+    }
+
     const save =
       async () => {
 
         try {
 
           await saveMaintenanceRecords(
-
             maintenanceRecords
-
           );
 
         } catch (error) {

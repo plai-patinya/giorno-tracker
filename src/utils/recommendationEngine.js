@@ -14,6 +14,8 @@ export const generateRecommendations = ({
 
   const recommendations = [];
 
+  let unknownCount = 0;
+
   const addServiceRecommendation = (
     icon,
     title,
@@ -24,20 +26,29 @@ export const generateRecommendations = ({
     // ไม่มีข้อมูล
     //
 
-    if (!service) {
+    if (
+      service.status ===
+      "unknown"
+    ) {
 
-      recommendations.push({
+      unknownCount++;
 
-        priority: "unknown",
+      if (unknownCount <= 3) {
 
-        icon,
+        recommendations.push({
 
-        title,
+          priority: "unknown",
 
-        description:
-          "ยังไม่มีประวัติการบำรุงรักษา"
+          icon,
 
-      });
+          title,
+
+          description:
+            "ยังไม่มีประวัติการบำรุงรักษา"
+
+        });
+
+      }
 
       return;
 
@@ -291,9 +302,17 @@ export const generateRecommendations = ({
   }
 
   const coverage =
-    maintenanceAnalytics?.maintenanceCoverage ?? 0;
+    maintenanceAnalytics?.maintenanceCoverage;
 
-  if (coverage < 30) {
+  if (
+
+    coverage !== null &&
+
+    coverage !== undefined &&
+
+    coverage < 30
+
+  ) {
 
     recommendations.push({
 
@@ -310,7 +329,15 @@ export const generateRecommendations = ({
     });
 
   }
-  else if (coverage < 70) {
+    else if (
+
+      coverage !== null &&
+
+      coverage !== undefined &&
+
+      coverage < 70
+
+    ) {
 
     recommendations.push({
 
@@ -350,6 +377,28 @@ export const generateRecommendations = ({
       priorityOrder[b.priority]
 
   );
+  
+  //
+  // ⚪ MORE UNKNOWN ITEMS
+  //
+
+  if (unknownCount > 3) {
+
+    recommendations.push({
+
+      priority: "unknown",
+
+      icon: "📋",
+
+      title:
+        "ยังไม่มีประวัติเพิ่มเติม",
+
+      description:
+        `อีก ${unknownCount - 3} รายการ`
+
+    });
+
+  }
 
   return recommendations;
 

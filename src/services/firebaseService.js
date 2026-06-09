@@ -90,7 +90,7 @@ import {
       return {
         expenses: [],
         fuelRecords: [],
-        serviceHistory: []
+        maintenanceRecords: []
       };
     }
 
@@ -99,7 +99,7 @@ import {
     return {
       expenses: data?.expenses || [],
       fuelRecords: data?.fuelRecords || [],
-      serviceHistory: data?.serviceHistory || []
+      maintenanceRecords: data?.maintenanceRecords || []
     };
 
   };

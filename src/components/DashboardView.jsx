@@ -155,7 +155,9 @@ from "../hooks/useMaintenanceAnalytics";
   const maintenanceAnalytics =
 
     useMaintenanceAnalytics(
-      currentOdo
+      currentOdo,
+
+      fuelRecords
     );
 
   const recommendations =
