@@ -1,18 +1,4 @@
-import {
-
-  Fuel,
-
-  Save,
-
-  X,
-
-  Droplets,
-
-  GaugeCircle,
-
-  Calendar
-
-} from "lucide-react";
+import { Fuel, Save, X, Droplets, GaugeCircle, Calendar } from "lucide-react";
 
 const inputStyle = `
 
@@ -43,7 +29,6 @@ const inputStyle = `
 `;
 
 const FuelModal = ({
-
   showFuelModal,
 
   setShowFuelModal,
@@ -71,38 +56,33 @@ const FuelModal = ({
 
   addFuelRecord,
 
-  resetFuelForm
-
+  resetFuelForm,
 }) => {
-
   //
   // 🚫 CLOSED
   //
 
-  if (!showFuelModal)
-    return null;
+  if (!showFuelModal) return null;
 
   //
   // ❌ CLOSE
   //
 
   const handleClose = () => {
-
     setShowFuelModal(false);
 
     resetFuelForm();
-
   };
 
   return (
-
     <div
-
       className="
 
         fixed inset-0
 
         z-[9999]
+
+        overflow-y-auto
 
         flex items-center justify-center
 
@@ -113,11 +93,8 @@ const FuelModal = ({
         p-4
 
       "
-
     >
-
       <div
-
         className="
 
           w-full max-w-2xl
@@ -132,18 +109,17 @@ const FuelModal = ({
 
           shadow-[0_0_80px_rgba(34,211,238,0.18)]
 
-          overflow-hidden
+          max-h-[90vh]
+
+          overflow-y-auto
 
           animate-[fadeInUp_0.35s_ease]
 
         "
-
       >
-
         {/* HEADER */}
 
         <div
-
           className="
 
             flex items-center justify-between
@@ -153,13 +129,9 @@ const FuelModal = ({
             border-b border-white/10
 
           "
-
         >
-
           <div className="flex items-center gap-4">
-
             <div
-
               className="
 
                 w-12 h-12
@@ -177,39 +149,23 @@ const FuelModal = ({
                 shadow-[0_0_30px_rgba(34,211,238,0.35)]
 
               "
-
             >
-
               <Fuel />
-
             </div>
 
             <div>
-
               <div className="text-2xl font-black">
-
-                {editingFuelId
-
-                  ? "Edit Fuel Record"
-
-                  : "Fuel Record"}
-
+                {editingFuelId ? "Edit Fuel Record" : "Fuel Record"}
               </div>
 
               <div className="text-white/50 text-sm">
-
                 บันทึกข้อมูลการเติมน้ำมันจริง
-
               </div>
-
             </div>
-
           </div>
 
           <button
-
             onClick={handleClose}
-
             className="
 
               w-10 h-10
@@ -225,54 +181,35 @@ const FuelModal = ({
               flex items-center justify-center
 
             "
-
           >
-
             <X size={18} />
-
           </button>
-
         </div>
 
         {/* BODY */}
 
         <div className="p-6 space-y-5">
-
           {/* DATE + ODOMETER */}
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-
             <div>
-
               <label className="text-sm text-white/60 flex items-center gap-2">
-
                 <Calendar size={14} />
-
                 วันที่เติมน้ำมัน
-
               </label>
 
               <input
                 type="date"
                 value={fuelDate}
-                onChange={(e) =>
-                  setFuelDate(
-                    e.target.value
-                  )
-                }
+                onChange={(e) => setFuelDate(e.target.value)}
                 className={inputStyle}
               />
-
             </div>
 
             <div>
-
               <label className="text-sm text-white/60 flex items-center gap-2">
-
                 <GaugeCircle size={14} />
-
                 ระยะทาง (km)
-
               </label>
 
               <input
@@ -280,30 +217,19 @@ const FuelModal = ({
                 step="0.1"
                 placeholder="เช่น 1250.5"
                 value={fuelOdometer}
-                onChange={(e) =>
-                  setFuelOdometer(
-                    e.target.value
-                  )
-                }
+                onChange={(e) => setFuelOdometer(e.target.value)}
                 className={inputStyle}
               />
-
             </div>
-
           </div>
 
           {/* LITERS + PRICE */}
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-
             <div>
-
               <label className="text-sm text-white/60 flex items-center gap-2">
-
                 <Droplets size={14} />
-
                 จำนวนลิตร
-
               </label>
 
               <input
@@ -311,97 +237,52 @@ const FuelModal = ({
                 step="0.01"
                 placeholder="เช่น 3.50"
                 value={fuelLiters}
-                onChange={(e) =>
-                  setFuelLiters(
-                    e.target.value
-                  )
-                }
+                onChange={(e) => setFuelLiters(e.target.value)}
                 className={inputStyle}
               />
-
             </div>
 
             <div>
-
-              <label className="text-sm text-white/60">
-
-                ราคา / ลิตร
-
-              </label>
+              <label className="text-sm text-white/60">ราคา / ลิตร</label>
 
               <input
                 type="number"
                 step="0.01"
                 placeholder="เช่น 35.50"
                 value={fuelPricePerLiter}
-                onChange={(e) =>
-                  setFuelPricePerLiter(
-                    e.target.value
-                  )
-                }
+                onChange={(e) => setFuelPricePerLiter(e.target.value)}
                 className={inputStyle}
               />
-
             </div>
-
           </div>
 
           {/* TYPE + TOTAL */}
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-
             <div>
-
-              <label className="text-sm text-white/60">
-
-                ประเภทน้ำมัน
-
-              </label>
+              <label className="text-sm text-white/60">ประเภทน้ำมัน</label>
 
               <select
                 value={fuelType}
-                onChange={(e) =>
-                  setFuelType(
-                    e.target.value
-                  )
-                }
+                onChange={(e) => setFuelType(e.target.value)}
                 className={inputStyle}
               >
-
-                {Object.entries(
-                  fuelTypes
-                ).map(([key, type]) => (
-
+                {Object.entries(fuelTypes).map(([key, type]) => (
                   <option
-
                     key={key}
-
                     value={key}
-
                     className="bg-[#14091f] text-white"
-
                   >
-
                     {type.name}
-
                   </option>
-
                 ))}
-
               </select>
-
             </div>
 
             <div>
-
-              <label className="text-sm text-white/60">
-
-                ราคารวม
-
-              </label>
+              <label className="text-sm text-white/60">ราคารวม</label>
 
               <div
-
                 className="
 
                   mt-2
@@ -421,23 +302,15 @@ const FuelModal = ({
                   shadow-inner
 
                 "
-
               >
-
-                ฿{Number(
-                  fuelTotalPrice || 0
-                ).toLocaleString()}
-
+                ฿{Number(fuelTotalPrice || 0).toLocaleString()}
               </div>
-
             </div>
-
           </div>
 
           {/* AI PREVIEW */}
 
           <div
-
             className="
 
               rounded-2xl
@@ -451,50 +324,37 @@ const FuelModal = ({
               backdrop-blur-xl
 
             "
-
           >
-
             <div className="text-sm text-cyan-300 font-semibold">
-
               Fuel Intelligence Preview
-
             </div>
 
             <div className="mt-2 text-white/70 text-sm leading-relaxed">
-
-              ระบบจะนำข้อมูลนี้ไปวิเคราะห์
-              อัตราสิ้นเปลือง,
-              พฤติกรรมการขับ,
-              Vehicle Health
-              และ AI Recommendation
-              แบบ real-time
-
+              ระบบจะนำข้อมูลนี้ไปวิเคราะห์ อัตราสิ้นเปลือง, พฤติกรรมการขับ,
+              Vehicle Health และ AI Recommendation แบบ real-time
             </div>
-
           </div>
-
         </div>
 
         {/* FOOTER */}
 
         <div
-
           className="
+            sticky bottom-0
 
             px-6 py-5
 
             border-t border-white/10
 
+            bg-[#12071f]/95
+
+            backdrop-blur-xl
+
             flex justify-end gap-3
-
           "
-
         >
-
           <button
-
             onClick={handleClose}
-
             className="
 
               px-5 py-3
@@ -512,27 +372,15 @@ const FuelModal = ({
               font-semibold
 
             "
-
           >
-
             Cancel
-
           </button>
 
           <button
-
             onClick={addFuelRecord}
-
             disabled={
-              !fuelOdometer ||
-
-              !fuelLiters ||
-
-              parseFloat(
-                fuelLiters
-              ) <= 0
+              !fuelOdometer || !fuelLiters || parseFloat(fuelLiters) <= 0
             }
-
             className="
 
               px-6 py-3
@@ -560,27 +408,15 @@ const FuelModal = ({
               flex items-center gap-2
 
             "
-
           >
-
             <Save size={18} />
 
-            {editingFuelId
-
-              ? "Save Changes"
-
-              : "Save Fuel Record"}
-
+            {editingFuelId ? "Save Changes" : "Save Fuel Record"}
           </button>
-
         </div>
-
       </div>
-
     </div>
-
   );
-
 };
 
 export default FuelModal;
