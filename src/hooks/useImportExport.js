@@ -1,108 +1,90 @@
 const useImportExport = ({
-
   expenses,
   setExpenses,
 
   fuelRecords,
   setFuelRecords,
 
+  maintenanceRecords,
+  setMaintenanceRecords,
+
   saveExpenses,
   saveFuelRecords,
-
-  setNotification,
-
-  setShowImportModal,
-  setImportText
-
+  saveMaintenanceRecords,
 }) => {
-
   // 📤 Export
   const exportedData = JSON.stringify(
-  {
-    version: "2.0",
-    exportDate: new Date().toISOString(),
-    expenses,
-    fuelRecords
-  },
-  null,
-  2
-);
+    {
+      version: "3.0",
+      exportDate: new Date().toISOString(),
+
+      expenses,
+      fuelRecords,
+      maintenanceRecords,
+    },
+    null,
+    2,
+  );
 
   const exportData = () => {
-
     navigator.clipboard.writeText(exportedData);
 
     setNotification({
       show: true,
       type: "success",
       title: "Export สำเร็จ",
-      message: "คัดลอก JSON แล้ว"
+      message: "คัดลอก JSON แล้ว",
     });
-
   };
 
   // 📥 Import
   const handleImportFromText = async (importText) => {
-
     try {
-
-      const parsed =
-        JSON.parse(importText);
+      const parsed = JSON.parse(importText);
 
       if (
         !parsed.expenses ||
-        !parsed.fuelRecords
+        !parsed.fuelRecords ||
+        !parsed.maintenanceRecords
       ) {
-
-        throw new Error(
-          "Invalid backup format"
-        );
-
+        throw new Error("Invalid backup format");
       }
 
       setExpenses(parsed.expenses);
       setFuelRecords(parsed.fuelRecords);
+      setMaintenanceRecords(parsed.maintenanceRecords);
 
       await saveExpenses(parsed.expenses);
 
-      await saveFuelRecords(
-        parsed.fuelRecords
-      );
+      await saveFuelRecords(parsed.fuelRecords);
 
       setNotification({
         show: true,
         type: "success",
         title: "Import สำเร็จ",
-        message: "นำเข้าข้อมูลเรียบร้อย"
+        message: "นำเข้าข้อมูลเรียบร้อย",
       });
 
       setShowImportModal(false);
 
-      setImportText('');
-
+      setImportText("");
     } catch (error) {
-
       setNotification({
         show: true,
         type: "error",
         title: "Import ไม่สำเร็จ",
-        message: "JSON ไม่ถูกต้อง"
+        message: "JSON ไม่ถูกต้อง",
       });
-
     }
-
   };
 
   return {
-
     exportedData,
 
     exportData,
 
-    handleImportFromText
-
+    handleImportFromText,
   };
-
 };
 
 export default useImportExport;
